@@ -45,22 +45,52 @@ body{
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;transition:opacity 0.35s ease;z-index:2;}
 .screen.hidden{opacity:0;pointer-events:none;}
 
+/* ── MENU SCREEN ── */
+#menuScreen{gap:0;justify-content:flex-end;padding:0 0 32px;}
+.menu-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(239,159,39,0.12) 0%,transparent 65%);pointer-events:none;}
+.menu-pack-wrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative;width:100%;overflow:hidden;}
+.menu-pack-img{width:220px;height:314px;object-fit:cover;border-radius:16px;box-shadow:0 0 60px rgba(239,159,39,0.25),0 20px 40px rgba(0,0,0,0.6);display:block;}
+.menu-pack-glow{position:absolute;width:220px;height:314px;border-radius:16px;box-shadow:0 0 80px rgba(239,159,39,0.18);pointer-events:none;}
+.menu-title{text-align:center;margin-bottom:28px;padding:0 20px;}
+.menu-title .mt1{font-family:'Cinzel Decorative',serif;font-size:9px;letter-spacing:0.28em;color:rgba(239,159,39,0.45);display:block;margin-bottom:8px;}
+.menu-title .mt2{font-size:30px;font-weight:700;letter-spacing:0.05em;color:#ef9f27;display:block;line-height:1;}
+.menu-title .mt3{font-size:12px;letter-spacing:0.18em;color:rgba(255,255,255,0.3);display:block;margin-top:6px;}
+.menu-buttons{width:100%;padding:0 20px;display:flex;flex-direction:column;gap:10px;}
+.menu-btn{width:100%;padding:0;border-radius:14px;font-family:'Cinzel',serif;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;transition:transform 0.12s,opacity 0.12s;}
+.menu-btn:active{transform:scale(0.97);opacity:0.88;}
+.menu-btn-pri{background:linear-gradient(135deg,#ef9f27,#d4841a);color:#080a10;}
+.menu-btn-sec{background:rgba(239,159,39,0.08);color:#ef9f27;border:1px solid rgba(239,159,39,0.22);}
+.mb-icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.mb-text{flex:1;text-align:left;padding:14px 0;}
+.mb-label{font-size:11px;letter-spacing:0.1em;line-height:1;}
+.mb-sub{font-size:8px;letter-spacing:0.07em;opacity:0.55;margin-top:3px;}
+.mb-badge{padding:4px 10px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:0.08em;margin-right:14px;flex-shrink:0;}
+.menu-btn-pri .mb-badge{background:rgba(0,0,0,0.18);color:#080a10;}
+.menu-btn-sec .mb-badge{background:rgba(239,159,39,0.12);color:#ef9f27;}
+.menu-set-label{font-size:8px;letter-spacing:0.1em;color:rgba(255,255,255,0.18);text-align:center;margin-top:14px;}
+
+/* ── PACK SCREEN ── */
 .pack-title{text-align:center;margin-bottom:24px;}
 .pack-title .t1{font-family:'Cinzel Decorative',serif;font-size:10px;letter-spacing:0.22em;color:#ef9f2755;display:block;margin-bottom:6px;}
 .pack-title .t2{font-size:28px;font-weight:700;letter-spacing:0.06em;color:#ef9f27;display:block;line-height:1;}
 .pack-title .t3{font-size:13px;letter-spacing:0.14em;color:rgba(255,255,255,0.38);display:block;margin-top:5px;}
+.pack-counter-label{font-size:9px;letter-spacing:0.1em;color:rgba(239,159,39,0.5);display:block;margin-top:8px;}
 
 .pack-container{position:relative;width:210px;height:300px;margin-bottom:24px;cursor:grab;touch-action:none;}
 .pack-container.dragging{cursor:grabbing;}
 .pack-body{position:absolute;bottom:0;left:0;right:0;background:#0c0e1c;border:2px solid #ef9f27;border-radius:0 0 14px 14px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.pack-body.has-img{background:none;border-color:#ef9f27;}
 .pack-body-grid{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(239,159,39,0.035) 0,rgba(239,159,39,0.035) 1px,transparent 1px,transparent 28px),repeating-linear-gradient(90deg,rgba(239,159,39,0.035) 0,rgba(239,159,39,0.035) 1px,transparent 1px,transparent 28px);}
 .pack-body-content{position:relative;z-index:2;text-align:center;padding:16px;display:flex;flex-direction:column;align-items:center;}
+.pack-body-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center bottom;}
 .pack-icon-big{font-size:48px;margin-bottom:10px;line-height:1;}
 .pack-name-big{font-size:14px;font-weight:700;letter-spacing:0.16em;color:#ef9f27;}
 .pack-sub-big{font-size:8px;letter-spacing:0.1em;color:rgba(239,159,39,0.4);margin-top:4px;}
 .pack-top{position:absolute;top:0;left:0;right:0;background:#0c0e1c;border:2px solid #ef9f27;border-bottom:none;border-radius:14px 14px 0 0;overflow:hidden;transform-origin:top center;}
+.pack-top.has-img{background:none;border-color:#ef9f27;}
 .pack-top-fill{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(239,159,39,0.035) 0,rgba(239,159,39,0.035) 1px,transparent 1px,transparent 28px),repeating-linear-gradient(90deg,rgba(239,159,39,0.035) 0,rgba(239,159,39,0.035) 1px,transparent 1px,transparent 28px);}
-.pack-top-label{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:7px;letter-spacing:0.14em;color:rgba(239,159,39,0.3);z-index:2;}
+.pack-top-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;}
+.pack-top-label{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:7px;letter-spacing:0.14em;color:rgba(239,159,39,0.7);z-index:2;text-shadow:0 1px 4px rgba(0,0,0,0.8);}
 .tear-edge{position:absolute;bottom:-2px;left:-2px;right:-2px;height:18px;z-index:3;}
 .rip-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;letter-spacing:0.1em;padding:3px 10px;border-radius:10px;white-space:nowrap;z-index:10;opacity:0;transition:opacity 0.2s;}
 .rip-badge.show{opacity:1;}
@@ -72,6 +102,7 @@ body{
 .pack-top.ripped{animation:flyAway 0.5s cubic-bezier(0.4,0,1,1) forwards;}
 @keyframes flyAway{0%{opacity:1;}100%{opacity:0;transform:translateY(-120px) rotate(var(--rip-angle,4deg)) scale(0.85);}}
 
+/* ── REVEAL SCREEN ── */
 #revealScreen{padding:0;justify-content:flex-start;}
 .reveal-header{width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;}
 .reveal-title{font-size:11px;font-weight:700;letter-spacing:0.14em;color:#ef9f27;}
@@ -91,6 +122,7 @@ body{
 .big-card.face-down{transform:rotateY(180deg);}
 .card-face,.card-back{position:absolute;inset:0;border-radius:14px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;}
 .card-back{transform:rotateY(180deg);background:#0c0e1c;border:2px solid rgba(239,159,39,0.45);display:flex;align-items:center;justify-content:center;}
+.card-back-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:14px;}
 .back-grid{position:absolute;inset:0;background-image:repeating-linear-gradient(45deg,rgba(239,159,39,0.03) 0,rgba(239,159,39,0.03) 1px,transparent 1px,transparent 16px);}
 .back-inner{text-align:center;position:relative;z-index:2;}
 .bi-icon{font-size:30px;margin-bottom:6px;}
@@ -124,6 +156,8 @@ body{
 .nbtn.pri{background:#ef9f27;color:#080a10;}
 .nbtn.sec{background:rgba(239,159,39,0.1);color:#ef9f27;border:1px solid rgba(239,159,39,0.28);}
 .nbtn:disabled{opacity:0.28;cursor:default;}
+
+/* ── SUMMARY SCREEN ── */
 #summaryScreen{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:18px 18px 32px;flex-direction:column;gap:10px;justify-content:flex-start;}
 .sum-hdr{text-align:center;width:100%;border-bottom:1px solid rgba(255,255,255,0.07);padding-bottom:10px;}
 .sum-hdr h2{font-size:13px;font-weight:700;letter-spacing:0.12em;color:#ef9f27;}
@@ -146,8 +180,11 @@ body{
 .cli-type{font-size:8px;color:rgba(255,255,255,0.28);margin-top:1px;letter-spacing:0.04em;}
 .cli-rar{font-size:7.5px;font-weight:700;letter-spacing:0.07em;padding:2px 7px;border-radius:7px;flex-shrink:0;}
 .cli-pr{width:21px;height:21px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;color:#fff;}
-.again-btn{width:100%;padding:14px;border-radius:12px;background:#ef9f27;color:#080a10;border:none;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.1em;cursor:pointer;margin-top:4px;}
+.sum-action-row{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.again-btn{width:100%;padding:14px;border-radius:12px;background:#ef9f27;color:#080a10;border:none;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.1em;cursor:pointer;}
 .again-btn:active{opacity:0.85;}
+.menu-btn-ghost{width:100%;padding:13px;border-radius:12px;background:transparent;color:rgba(255,255,255,0.28);border:1px solid rgba(255,255,255,0.1);font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:0.1em;cursor:pointer;}
+.menu-btn-ghost:active{opacity:0.7;}
 .install-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:0.08em;color:rgba(255,255,255,0.15);text-align:center;z-index:5;white-space:nowrap;}
 </style>
 </head>
@@ -155,22 +192,67 @@ body{
 <div id="app">
 <div id="particles"></div>
 
-<div class="screen" id="packScreen">
+<!-- MENU SCREEN -->
+<div class="screen" id="menuScreen">
+  <div class="menu-bg"></div>
+  <div class="menu-pack-wrap">
+    <img class="menu-pack-img" src="pack.jpg" alt="OPM TCG Pack" onerror="this.style.display='none'">
+    <div class="menu-pack-glow"></div>
+  </div>
+  <div class="menu-title">
+    <span class="mt1">SET 1 · MONSTER ASSOCIATION ARC</span>
+    <span class="mt2">ONE PUNCH</span>
+    <span class="mt3">TRADING CARD GAME</span>
+  </div>
+  <div class="menu-buttons">
+    <button class="menu-btn menu-btn-pri" id="open1Btn">
+      <div class="mb-icon">👊</div>
+      <div class="mb-text">
+        <div class="mb-label">OPEN 1 PACK</div>
+        <div class="mb-sub">10 cards · 1 guaranteed rare</div>
+      </div>
+      <div class="mb-badge">×1</div>
+    </button>
+    <button class="menu-btn menu-btn-sec" id="open5Btn">
+      <div class="mb-icon">⚡</div>
+      <div class="mb-text">
+        <div class="mb-label">OPEN 5 PACKS</div>
+        <div class="mb-sub">50 cards · 5 chases</div>
+      </div>
+      <div class="mb-badge">×5</div>
+    </button>
+    <button class="menu-btn menu-btn-sec" id="open10Btn">
+      <div class="mb-icon">🔥</div>
+      <div class="mb-text">
+        <div class="mb-label">OPEN 10 PACKS</div>
+        <div class="mb-sub">100 cards · guaranteed SSR+</div>
+      </div>
+      <div class="mb-badge">×10</div>
+    </button>
+  </div>
+  <div class="menu-set-label">6C · 2U · 1R · 1 CHASE PER PACK</div>
+</div>
+
+<!-- PACK SCREEN -->
+<div class="screen hidden" id="packScreen">
   <div class="pack-title">
     <span class="t1">SET 1 · MONSTER ASSOCIATION ARC</span>
     <span class="t2">ONE PUNCH</span>
     <span class="t3">TRADING CARD GAME</span>
+    <span class="pack-counter-label" id="packCounterLabel"></span>
   </div>
   <div class="pack-container" id="packContainer">
-    <div class="pack-top" id="packTop">
-      <div class="pack-top-fill"></div>
+    <div class="pack-top has-img" id="packTop">
+      <img class="pack-top-img" src="pack.jpg" alt="" onerror="this.style.display='none';this.nextSibling.style.display='block'">
+      <div class="pack-top-fill" style="display:none;"></div>
       <div class="pack-top-label">PULL TO OPEN</div>
       <svg class="tear-edge" id="tearEdgeSVG" viewBox="0 0 214 18" preserveAspectRatio="none"></svg>
     </div>
     <div class="rip-badge" id="ripBadge"></div>
-    <div class="pack-body" id="packBody">
-      <div class="pack-body-grid"></div>
-      <div class="pack-body-content">
+    <div class="pack-body has-img" id="packBody">
+      <img class="pack-body-img" src="pack.jpg" alt="" onerror="this.style.display='none';this.nextSibling.style.display='block'">
+      <div class="pack-body-grid" style="display:none;"></div>
+      <div class="pack-body-content" style="display:none;">
         <div class="pack-icon-big">&#128074;</div>
         <div class="pack-name-big">ONE PUNCH TCG</div>
         <div class="pack-sub-big">MONSTER ASSOCIATION ARC</div>
@@ -182,9 +264,10 @@ body{
   <div class="pack-info-row">10 cards · 6C · 2U · 1R · 1 Chase</div>
 </div>
 
+<!-- REVEAL SCREEN -->
 <div class="screen hidden" id="revealScreen">
   <div class="reveal-header">
-    <div class="reveal-title">OPENING PACK</div>
+    <div class="reveal-title" id="revealTitle">OPENING PACK</div>
     <div class="reveal-counter" id="revCounter">1 / 10</div>
     <button class="skip-all" id="skipAll">SKIP</button>
   </div>
@@ -204,8 +287,9 @@ body{
   </div>
 </div>
 
+<!-- SUMMARY SCREEN -->
 <div class="screen hidden" id="summaryScreen">
-  <div class="sum-hdr"><h2>PACK OPENED</h2><p id="sumSub"></p></div>
+  <div class="sum-hdr"><h2 id="sumTitle">PACK OPENED</h2><p id="sumSub"></p></div>
   <div class="rip-ribbon" id="ripRibbon">
     <div class="rr-icon" id="rrIcon"></div>
     <div class="rr-text">
@@ -223,7 +307,10 @@ body{
     <div class="bb-icon" id="bestIcon"></div>
   </div>
   <div class="card-list" id="cardList"></div>
-  <button class="again-btn" id="againBtn">OPEN ANOTHER PACK</button>
+  <div class="sum-action-row">
+    <button class="again-btn" id="againBtn">OPEN NEXT PACK</button>
+    <button class="menu-btn-ghost" id="menuBtn">BACK TO MENU</button>
+  </div>
 </div>
 </div>
 

@@ -171,6 +171,8 @@ let pack=[],curIdx=0,revealedSet=new Set();
 function startReveal(){
   pack=pullPack();curIdx=0;revealedSet.clear();
   document.getElementById("progStrip").innerHTML=pack.map((_,i)=>`<div class="pd" id="pd${i}"></div>`).join("");
+  const title=packsToOpen>1?`PACK ${packsOpened+1} OF ${packsToOpen}`:"OPENING PACK";
+  document.getElementById("revealTitle").textContent=title;
   showScreen("revealScreen");
   renderCard(0);
 }
@@ -269,7 +271,7 @@ function showSummary(){
   document.getElementById("rrQuality").textContent=rip.label;
   document.getElementById("rrQuality").style.color=rip.color;
   document.getElementById("rrDesc").textContent=rip.desc;
-  const best=pack.reduce((b,c)=>RO.indexOf(c.rarity)>RO.indexOf(b.rarity)?c:b);
+  const best=(isLastPack&&packsToOpen>1?allPulledCards:pack).reduce((b,c)=>RO.indexOf(c.rarity)>RO.indexOf(b.rarity)?c:b);
   const brc=RC[best.rarity];
   const banner=document.getElementById("bestBanner");
   banner.style.background=brc.color+"12";
@@ -279,8 +281,31 @@ function showSummary(){
   document.getElementById("bestRarLabel").textContent=brc.label;
   document.getElementById("bestRarLabel").style.color=brc.color;
   document.getElementById("bestIcon").textContent=["ssr","super-saitama","ssst"].includes(best.rarity)?"🔥":best.rarity==="saitama"?"👊":"⭐";
-  document.getElementById("sumSub").textContent=`Monster Association Arc · ${pack.length} cards`;
-  document.getElementById("cardList").innerHTML=pack.map(card=>{
+  // Accumulate cards across packs
+  packsOpened++;
+  allPulledCards.push(...pack);
+  const isLastPack=packsOpened>=packsToOpen;
+  const displayCards=isLastPack&&packsToOpen>1?allPulledCards:pack;
+
+  // Title + subtitle
+  document.getElementById("sumTitle").textContent=isLastPack&&packsToOpen>1?"ALL PACKS OPENED":"PACK OPENED";
+  document.getElementById("sumSub").textContent=`Monster Association Arc · ${displayCards.length} card${displayCards.length!==1?"s":""}${packsToOpen>1?` · ${packsOpened} pack${packsOpened!==1?"s":""}` :""}`;
+
+  // Again / menu buttons
+  const againBtn=document.getElementById("againBtn");
+  const menuBtn=document.getElementById("menuBtn");
+  if(isLastPack){
+    againBtn.textContent="OPEN AGAIN";
+    againBtn.onclick=()=>startSession(packsToOpen);
+  } else {
+    againBtn.textContent=`OPEN NEXT PACK (${packsOpened+1}/${packsToOpen})`;
+    againBtn.onclick=()=>{resetPackScreen();showScreen("packScreen");};
+  }
+  menuBtn.style.display="block";
+
+  // Best pull across all displayed cards
+  const bestPool=displayCards;
+  document.getElementById("cardList").innerHTML=displayCards.map(card=>{
     const rc=RC[card.rarity],fac=FA[card.faction]||FA.hero;
     const prStr=card.pr!==null?String(card.pr):"";
     return`<div class="cli"><div class="cli-dot" style="background:${fac.col};"></div><div class="cli-info"><div class="cli-name">${card.name}</div><div class="cli-type">${card.type} · ${card.threat}</div></div><div class="cli-rar" style="background:${rc.color}15;color:${rc.dim};border:0.5px solid ${rc.color}33;">${rc.label}</div>${prStr?`<div class="cli-pr" style="background:${rc.color};">${prStr}</div>`:""}</div>`;
@@ -288,19 +313,6 @@ function showSummary(){
   showScreen("summaryScreen");
   if(rip.confetti)spawnConfetti();else spawnParticles(brc.color,12);
 }
-document.getElementById("againBtn").addEventListener("click",()=>{
-  packOpened=false;currentRip=null;dragCurrentY=0;isDragging=false;
-  packTop.classList.remove("ripped");
-  packTop.style.transition="none";
-  packTop.style.transform="translateY(0)";
-  packTop.style.opacity="1";
-  packBody.style.boxShadow="none";
-  ripBadge.classList.remove("show");
-  pullInstruction.textContent="SLIDE DOWN TO OPEN";
-  document.getElementById("tearEdgeSVG").innerHTML="";
-  setTimeout(()=>{packTop.style.transition="";},50);
-  showScreen("packScreen");
-});
 
 /* ── PARTICLES ── */
 function spawnParticles(color,count){
@@ -329,12 +341,57 @@ function spawnConfetti(){
 }
 
 /* ── SCREENS ── */
+const ALL_SCREENS=["menuScreen","packScreen","revealScreen","summaryScreen"];
 function showScreen(id){
-  ["packScreen","revealScreen","summaryScreen"].forEach(s=>{document.getElementById(s).classList.toggle("hidden",s!==id);});
+  ALL_SCREENS.forEach(s=>{document.getElementById(s).classList.toggle("hidden",s!==id);});
   if(id==="summaryScreen")document.getElementById("summaryScreen").scrollTop=0;
 }
+
+/* ── MULTI-PACK STATE ── */
+let packsToOpen=1,packsOpened=0,allPulledCards=[];
+
+function startSession(count){
+  packsToOpen=count;
+  packsOpened=0;
+  allPulledCards=[];
+  resetPackScreen();
+  showScreen("packScreen");
+}
+
+function resetPackScreen(){
+  packOpened=false;currentRip=null;dragCurrentY=0;isDragging=false;
+  packTop.classList.remove("ripped");
+  packTop.style.transition="none";
+  packTop.style.transform="translateY(0)";
+  packTop.style.opacity="1";
+  packBody.style.boxShadow="none";
+  ripBadge.classList.remove("show");
+  pullInstruction.textContent="SLIDE DOWN TO OPEN";
+  document.getElementById("tearEdgeSVG").innerHTML="";
+  setTimeout(()=>{packTop.style.transition="";},50);
+  // Update pack counter label
+  const lbl=document.getElementById("packCounterLabel");
+  if(packsToOpen>1){lbl.textContent=`PACK ${packsOpened+1} OF ${packsToOpen}`;}
+  else{lbl.textContent="";}
+  initPackDimensions();
+}
+
+/* ── MENU WIRING ── */
+document.getElementById("open1Btn").addEventListener("click",()=>startSession(1));
+document.getElementById("open5Btn").addEventListener("click",()=>startSession(5));
+document.getElementById("open10Btn").addEventListener("click",()=>startSession(10));
+
+/* ── AGAIN / MENU BUTTONS ── */
+document.getElementById("againBtn").addEventListener("click",()=>{
+  resetPackScreen();
+  showScreen("packScreen");
+});
+document.getElementById("menuBtn").addEventListener("click",()=>{
+  showScreen("menuScreen");
+});
 
 /* ── INIT ── */
 initPackDimensions();
 buildTearEdge(RIP_STATES[2]);
+showScreen("menuScreen");
 setInterval(()=>spawnParticles(["#ef9f2218","#185fa218","#7f77dd18"][Math.floor(Math.random()*3)],1),3000);
