@@ -235,28 +235,14 @@ function pullPack(){
   return[...Array.from({length:6},()=>pickFrom("common")),...Array.from({length:2},()=>pickFrom("uncommon")),pickFrom("rare"),pickFrom(chase)];
 }
 
-function buildTearEdge(ripState){
-  const amp=ripState.jaggedAmp,w=214,pts=28,step=w/(pts-1);
-  const ys=[];
-  for(let i=0;i<pts;i++){
-    ys.push(ripState.jagged?(i%2===0?amp*0.3:amp)*(0.5+Math.random()*0.5)*-1:Math.sin(i*0.8)*amp*0.4);
-  }
-  let d=`M0,0 `;
-  for(let i=0;i<pts;i++)d+=`L${(i*step).toFixed(1)},${ys[i].toFixed(1)} `;
-  d+=`L${w},0 L${w},18 L0,18 Z`;
-  const line=`M0,0 ${ys.map((y,i)=>`L${(i*step).toFixed(1)},${y.toFixed(1)}`).join(" ")} L${w},0`;
-  document.getElementById("tearEdgeSVG").innerHTML=
-    `<path d="${d}" fill="#080a10"/><path d="${line}" fill="none" stroke="rgba(239,159,39,0.25)" stroke-width="1"/>`;
-}
 
-/* ── DRAG MECHANIC ── */
+/* ── SLIDE MECHANIC ── */
 let dragStartY=0,dragCurrentY=0,isDragging=false,packOpened=false,currentRip=null;
-const DRAG_THRESHOLD=80,TOP_HEIGHT=72,BODY_HEIGHT=228;
+const DRAG_THRESHOLD=75,TOP_HEIGHT=72,BODY_HEIGHT=228;
 
 const packContainer=document.getElementById("packContainer");
 const packTop=document.getElementById("packTop");
 const packBody=document.getElementById("packBody");
-const ripBadge=document.getElementById("ripBadge");
 const pullInstruction=document.getElementById("pullInstruction");
 
 function initPackDimensions(){
@@ -270,54 +256,53 @@ function onDragStart(e){
   isDragging=true;
   dragStartY=e.touches?e.touches[0].clientY:e.clientY;
   packContainer.classList.add("dragging");
-  if(!currentRip){currentRip=pickRip();buildTearEdge(currentRip);}
+  if(!currentRip)currentRip=pickRip();
 }
 function onDragMove(e){
   if(!isDragging||packOpened)return;
   if(e.cancelable)e.preventDefault();
   dragCurrentY=(e.touches?e.touches[0].clientY:e.clientY)-dragStartY;
-  const progress=Math.max(0,Math.min(1,dragCurrentY/DRAG_THRESHOLD));
-  packTop.style.transform=`translateY(${-progress*TOP_HEIGHT*1.4}px)`;
-  packTop.style.opacity=String(1-progress*0.6);
-  packBody.style.boxShadow=`0 0 ${progress*24}px rgba(239,159,39,${progress*0.3})`;
-  if(progress>0.15){
-    ripBadge.style.color=currentRip.color;
-    ripBadge.style.background=currentRip.color+"22";
-    ripBadge.style.border=`1px solid ${currentRip.color}44`;
-    ripBadge.textContent=currentRip.label;
-    ripBadge.classList.add("show");
-  }
-  if(progress<0.3)pullInstruction.textContent="SLIDE DOWN TO OPEN";
-  else if(progress<0.7)pullInstruction.textContent="KEEP PULLING…";
+  // Slide UP = negative dragCurrentY
+  const progress=Math.max(0,Math.min(1,-dragCurrentY/DRAG_THRESHOLD));
+  packTop.style.transform=`translateY(${-progress*TOP_HEIGHT*1.5}px)`;
+  packTop.style.opacity=String(1-progress*0.5);
+  packBody.style.boxShadow=`0 0 ${progress*32}px rgba(239,159,39,${progress*0.45}), inset 0 0 ${progress*16}px rgba(239,159,39,${progress*0.12})`;
+  if(progress<0.3)pullInstruction.textContent="SLIDE UP TO OPEN";
+  else if(progress<0.75)pullInstruction.textContent="KEEP GOING…";
   else pullInstruction.textContent="RELEASE TO OPEN";
-  if(progress>=1)finishRip();
+  if(progress>=1)finishOpen();
 }
 function onDragEnd(){
   if(!isDragging||packOpened)return;
   isDragging=false;
   packContainer.classList.remove("dragging");
-  if(dragCurrentY/DRAG_THRESHOLD<1){
-    packTop.style.transition="transform 0.35s ease, opacity 0.35s ease";
+  if(-dragCurrentY/DRAG_THRESHOLD<1){
+    packTop.style.transition="transform 0.3s cubic-bezier(0.34,1.1,0.64,1), opacity 0.3s ease";
     packTop.style.transform="translateY(0)";
     packTop.style.opacity="1";
     packBody.style.boxShadow="none";
-    ripBadge.classList.remove("show");
-    setTimeout(()=>{packTop.style.transition="";},380);
-    pullInstruction.textContent="SLIDE DOWN TO OPEN";
+    setTimeout(()=>{packTop.style.transition="";},320);
+    pullInstruction.textContent="SLIDE UP TO OPEN";
     dragCurrentY=0;
   }
 }
-function finishRip(){
+function finishOpen(){
   if(packOpened)return;
   packOpened=true;
-  if(navigator.vibrate)navigator.vibrate(currentRip.confetti?[40,30,40]:30);
-  packTop.style.setProperty("--rip-angle",currentRip.angle);
-  packTop.classList.add("ripped");
+  if(navigator.vibrate)navigator.vibrate(currentRip.confetti?[20,15,40]:20);
+  // Start CSS animation from current dragged position
+  const fromY=(-Math.abs(dragCurrentY)*1.2).toFixed(0);
+  packTop.style.setProperty("--slide-from", fromY+"px");
+  packTop.style.transform="";
+  packTop.classList.add("slide-open");
+  // Body reveal flash
+  packBody.style.transition="box-shadow 0.35s ease";
+  packBody.style.boxShadow="0 0 48px rgba(239,159,39,0.6), inset 0 0 24px rgba(239,159,39,0.15)";
+  setTimeout(()=>{packBody.style.boxShadow="";packBody.style.transition="";},500);
   if(currentRip.confetti)spawnConfetti();else spawnParticles(currentRip.color,14);
-  // Rip quality voice
   if(currentRip.id==="catastrophic") playSound("rip_catastrophic");
   else if(currentRip.id==="perfect") playSound("rip_perfect");
-  setTimeout(()=>startReveal(),520);
+  setTimeout(()=>startReveal(),480);
 }
 packContainer.addEventListener("touchstart",onDragStart,{passive:true});
 packContainer.addEventListener("touchmove",onDragMove,{passive:false});
@@ -629,14 +614,12 @@ function startSession(count){
 
 function resetPackScreen(){
   packOpened=false;currentRip=null;dragCurrentY=0;isDragging=false;
-  packTop.classList.remove("ripped");
+  packTop.classList.remove("slide-open");
   packTop.style.transition="none";
   packTop.style.transform="translateY(0)";
   packTop.style.opacity="1";
   packBody.style.boxShadow="none";
-  ripBadge.classList.remove("show");
-  pullInstruction.textContent="SLIDE DOWN TO OPEN";
-  document.getElementById("tearEdgeSVG").innerHTML="";
+  pullInstruction.textContent="SLIDE UP TO OPEN";
   setTimeout(()=>{packTop.style.transition="";},50);
   const lbl=document.getElementById("packCounterLabel");
   if(packsToOpen>1){lbl.textContent=`PACK ${packsOpened+1} OF ${packsToOpen}`;}
@@ -862,7 +845,6 @@ document.getElementById("marketBackBtn").addEventListener("click",()=>showScreen
 preloadSounds();
 buildCardWall();
 initPackDimensions();
-buildTearEdge(RIP_STATES[2]);
 refreshGoldDisplays();
 showScreen("menuScreen");
 document.getElementById("soundToggle").textContent = soundEnabled ? "🔊" : "🔇";

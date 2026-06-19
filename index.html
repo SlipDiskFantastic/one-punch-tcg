@@ -88,8 +88,8 @@ body{
 .pack-title .t3{font-size:13px;letter-spacing:0.14em;color:rgba(255,255,255,0.38);display:block;margin-top:5px;}
 .pack-counter-label{font-size:9px;letter-spacing:0.1em;color:rgba(239,159,39,0.5);display:block;margin-top:8px;}
 
-.pack-container{position:relative;width:210px;height:300px;margin-bottom:24px;cursor:grab;touch-action:none;}
-.pack-container.dragging{cursor:grabbing;}
+.pack-container{position:relative;width:210px;height:300px;margin-bottom:24px;cursor:ns-resize;touch-action:none;}
+.pack-container.dragging{cursor:ns-resize;}
 .pack-body{position:absolute;bottom:0;left:0;right:0;background:#0c0e1c;border:2px solid #ef9f27;border-radius:0 0 14px 14px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .pack-body.has-img{background:none;border-color:#ef9f27;}
 .pack-body-grid{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(239,159,39,0.035) 0,rgba(239,159,39,0.035) 1px,transparent 1px,transparent 28px),repeating-linear-gradient(90deg,rgba(239,159,39,0.035) 0,rgba(239,159,39,0.035) 1px,transparent 1px,transparent 28px);}
@@ -103,16 +103,15 @@ body{
 .pack-top-fill{position:absolute;inset:0;background-image:repeating-linear-gradient(0deg,rgba(239,159,39,0.035) 0,rgba(239,159,39,0.035) 1px,transparent 1px,transparent 28px),repeating-linear-gradient(90deg,rgba(239,159,39,0.035) 0,rgba(239,159,39,0.035) 1px,transparent 1px,transparent 28px);}
 .pack-top-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;}
 .pack-top-label{position:absolute;bottom:8px;left:0;right:0;text-align:center;font-size:7px;letter-spacing:0.14em;color:rgba(239,159,39,0.7);z-index:2;text-shadow:0 1px 4px rgba(0,0,0,0.8);}
-.tear-edge{position:absolute;bottom:-2px;left:-2px;right:-2px;height:18px;z-index:3;}
-.rip-badge{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;letter-spacing:0.1em;padding:3px 10px;border-radius:10px;white-space:nowrap;z-index:10;opacity:0;transition:opacity 0.2s;}
-.rip-badge.show{opacity:1;}
+.tear-edge{display:none;}
+.rip-badge{display:none;}
 .pull-instruction{font-size:10px;letter-spacing:0.12em;color:rgba(255,255,255,0.22);text-align:center;margin-bottom:8px;transition:opacity 0.3s;}
-.drag-arrow{display:flex;flex-direction:column;align-items:center;gap:3px;opacity:0.3;margin-bottom:16px;animation:bob 1.4s ease-in-out infinite;}
-@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+.drag-arrow{display:flex;flex-direction:column-reverse;align-items:center;gap:3px;opacity:0.3;margin-bottom:16px;animation:bob 1.4s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
 .drag-arrow span{font-size:18px;color:#ef9f27;line-height:0.6;}
 .pack-info-row{font-size:9px;letter-spacing:0.09em;color:rgba(255,255,255,0.18);text-align:center;}
-.pack-top.ripped{animation:flyAway 0.5s cubic-bezier(0.4,0,1,1) forwards;}
-@keyframes flyAway{0%{opacity:1;}100%{opacity:0;transform:translateY(-120px) rotate(var(--rip-angle,4deg)) scale(0.85);}}
+.pack-top.slide-open{animation:slideOff 0.42s cubic-bezier(0.3,0,0.5,1) forwards;}
+@keyframes slideOff{0%{transform:translateY(var(--slide-from,-90px));opacity:1;}100%{transform:translateY(-340px);opacity:0;}}
 
 /* ── REVEAL SCREEN ── */
 #revealScreen{padding:0;justify-content:flex-start;}
@@ -359,10 +358,8 @@ body{
     <div class="pack-top has-img" id="packTop">
       <img class="pack-top-img" src="pack.jpg" alt="" onerror="this.style.display='none';this.nextSibling.style.display='block'">
       <div class="pack-top-fill" style="display:none;"></div>
-      <div class="pack-top-label">PULL TO OPEN</div>
-      <svg class="tear-edge" id="tearEdgeSVG" viewBox="0 0 214 18" preserveAspectRatio="none"></svg>
+      <div class="pack-top-label">SLIDE UP TO OPEN</div>
     </div>
-    <div class="rip-badge" id="ripBadge"></div>
     <div class="pack-body has-img" id="packBody">
       <img class="pack-body-img" src="pack.jpg" alt="" onerror="this.style.display='none';this.nextSibling.style.display='block'">
       <div class="pack-body-grid" style="display:none;"></div>
@@ -373,8 +370,8 @@ body{
       </div>
     </div>
   </div>
-  <div class="pull-instruction" id="pullInstruction">SLIDE DOWN TO OPEN</div>
-  <div class="drag-arrow"><span>&#8964;</span><span style="opacity:0.4;margin-top:-4px;">&#8964;</span></div>
+  <div class="pull-instruction" id="pullInstruction">SLIDE UP TO OPEN</div>
+  <div class="drag-arrow"><span>&#8963;</span><span style="opacity:0.4;margin-bottom:-4px;">&#8963;</span></div>
   <div class="pack-info-row">10 cards · 6C · 2U · 1R · 1 Chase</div>
 </div>
 
