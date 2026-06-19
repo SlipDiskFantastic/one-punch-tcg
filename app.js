@@ -61,6 +61,73 @@ const RIP_STATES=[
   {id:"perfect",      weight:10, label:"PERFECT OPEN",     desc:"Collector quality. Nice.",         icon:"🏆", color:"#EF9F27", angle:"-1deg", jaggedAmp:1,  jagged:false, confetti:true},
 ];
 
+/* ── SOUND ENGINE ── */
+const SFX = {};
+const BG = { node: null, name: null };
+let soundEnabled = localStorage.getItem("opm_sound") !== "off";
+
+function preloadSounds() {
+  const files = [
+    "pack_open","pull_rare","pull_ssr","pull_saitama","pull_god",
+    "rip_catastrophic","rip_perfect","sell_dupe","buy_pack",
+    "binder_open","market_open","no_gold",
+    "sting_pack","sting_rare","sting_saitama",
+    "bg_menu","bg_market"
+  ];
+  files.forEach(name => {
+    const a = new Audio(`sounds/${name}.mp3`);
+    a.preload = "auto";
+    SFX[name] = a;
+  });
+  SFX["bg_menu"].loop = true;
+  SFX["bg_menu"].volume = 0.35;
+  SFX["bg_market"].loop = true;
+  SFX["bg_market"].volume = 0.25;
+}
+
+function playSound(name, volume = 1) {
+  if (!soundEnabled || !SFX[name]) return;
+  const a = SFX[name].cloneNode();
+  a.volume = volume;
+  a.play().catch(() => {});
+}
+
+function playBg(name) {
+  if (BG.name === name) return;
+  if (BG.node) { BG.node.pause(); BG.node.currentTime = 0; }
+  if (!soundEnabled || !SFX[name]) { BG.name = name; return; }
+  BG.node = SFX[name];
+  BG.name = name;
+  BG.node.currentTime = 0;
+  BG.node.play().catch(() => {});
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem("opm_sound", soundEnabled ? "on" : "off");
+  if (!soundEnabled && BG.node) BG.node.pause();
+  else if (soundEnabled && BG.node && BG.name) BG.node.play().catch(() => {});
+  document.getElementById("soundToggle").textContent = soundEnabled ? "🔊" : "🔇";
+}
+
+function playCardFlip() {
+  if (!soundEnabled) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const buf = ctx.createBuffer(1, ctx.sampleRate * 0.05, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.18, ctx.currentTime);
+    src.connect(gain);
+    gain.connect(ctx.destination);
+    src.start();
+    setTimeout(() => ctx.close(), 200);
+  } catch(e) {}
+}
+
 /* ── CURRENCY ── */
 const SELL_PRICE={
   "common":5,"uncommon":20,"rare":75,"serious-rare":200,
@@ -237,6 +304,9 @@ function finishRip(){
   packTop.style.setProperty("--rip-angle",currentRip.angle);
   packTop.classList.add("ripped");
   if(currentRip.confetti)spawnConfetti();else spawnParticles(currentRip.color,14);
+  // Rip quality voice
+  if(currentRip.id==="catastrophic") playSound("rip_catastrophic");
+  else if(currentRip.id==="perfect") playSound("rip_perfect");
   setTimeout(()=>startReveal(),520);
 }
 packContainer.addEventListener("touchstart",onDragStart,{passive:true});
@@ -254,6 +324,13 @@ function startReveal(){
   const title=packsToOpen>1?`PACK ${packsOpened+1} OF ${packsToOpen}`:"OPENING PACK";
   document.getElementById("revealTitle").textContent=title;
   showScreen("revealScreen");
+  // Determine best rarity in pack and play appropriate sting
+  const bestCard=pack.reduce((b,c)=>RO.indexOf(c.rarity)>RO.indexOf(b.rarity)?c:b);
+  const bestRarity=bestCard.rarity;
+  if(["ssr","saitama","super-saitama","ssst"].includes(bestRarity)) playSound("sting_saitama");
+  else if(["rare","serious-rare"].includes(bestRarity)) playSound("sting_rare");
+  else playSound("sting_pack");
+  playSound("pack_open",0.7);
   renderCard(0);
 }
 function cardArtPath(card){
@@ -324,8 +401,18 @@ function renderCard(idx){
     hint.textContent="TAP CARD TO REVEAL";
     el.addEventListener("click",()=>{
       if(el.classList.contains("face-down")){
+        playCardFlip();
         el.classList.remove("face-down");revealedSet.add(idx);hint.textContent="";
-        if(rc.flash){if(navigator.vibrate)navigator.vibrate(20);spawnParticles(rc.flash,18);showFlash(card);}
+        if(rc.flash){
+          if(navigator.vibrate)navigator.vibrate(20);
+          spawnParticles(rc.flash,18);
+          showFlash(card);
+          // Rarity pull sound
+          if(card.rarity==="ssst") playSound("pull_god");
+          else if(card.rarity==="saitama"||card.rarity==="super-saitama") playSound("pull_saitama");
+          else if(card.rarity==="ssr") playSound("pull_ssr");
+          else if(card.rarity==="serious-rare"||card.rarity==="rare") playSound("pull_rare");
+        }
       }
     },{once:true});
   }
@@ -438,6 +525,10 @@ function showScreen(id){
   if(id==="binderScreen"){renderBinderScreen();document.getElementById("binderScreen").scrollTop=0;}
   if(id==="marketScreen"){renderMarketScreen();document.getElementById("marketScreen").scrollTop=0;}
   if(id==="menuScreen"){refreshGoldDisplays();}
+  // Background music
+  if(id==="menuScreen"||id==="packScreen") playBg("bg_menu");
+  else if(id==="marketScreen"||id==="binderScreen") playBg("bg_market");
+  // revealScreen and summaryScreen leave bg music unchanged
 }
 
 /* ── MULTI-PACK STATE ── */
@@ -542,6 +633,7 @@ function openCardModal(card){
         saveBinder(b);
         addGold(price);
         refreshGoldDisplays();
+        playSound("sell_dupe");
         openCardModal(card);// refresh modal
         renderBinderScreen();
       }
@@ -625,6 +717,7 @@ function renderMarketScreen(){
         b2[key]--;
         saveBinder(b2);
         addGold(price);
+        playSound("sell_dupe");
         renderMarketScreen();
       }
     });
@@ -643,14 +736,16 @@ document.getElementById("mktSellAll").addEventListener("click",()=>{
   });
   saveBinder(b);
   addGold(earned);
+  if(earned>0)playSound("sell_dupe");
   renderMarketScreen();
 });
 
 // Market buy buttons
 function setupMarketBuyBtn(btnId,count,price){
   document.getElementById(btnId).addEventListener("click",()=>{
-    if(getGold()<price)return;
+    if(getGold()<price){playSound("no_gold");return;}
     if(spendGold(price)){
+      playSound("buy_pack");
       refreshGoldDisplays();
       startSession(count);
     }
@@ -664,8 +759,8 @@ setupMarketBuyBtn("mktBuy10",10,800);
 document.getElementById("open1Btn").addEventListener("click",()=>startSession(1));
 document.getElementById("open5Btn").addEventListener("click",()=>startSession(5));
 document.getElementById("open10Btn").addEventListener("click",()=>startSession(10));
-document.getElementById("binderNavBtn").addEventListener("click",()=>showScreen("binderScreen"));
-document.getElementById("marketNavBtn").addEventListener("click",()=>showScreen("marketScreen"));
+document.getElementById("binderNavBtn").addEventListener("click",()=>{playSound("binder_open",0.8);showScreen("binderScreen");});
+document.getElementById("marketNavBtn").addEventListener("click",()=>{playSound("market_open",0.8);showScreen("marketScreen");});
 
 /* ── AGAIN / MENU BUTTONS ── */
 document.getElementById("againBtn").addEventListener("click",()=>{
@@ -679,9 +774,11 @@ document.getElementById("binderBackBtn").addEventListener("click",()=>showScreen
 document.getElementById("marketBackBtn").addEventListener("click",()=>showScreen("menuScreen"));
 
 /* ── INIT ── */
+preloadSounds();
 buildCardWall();
 initPackDimensions();
 buildTearEdge(RIP_STATES[2]);
 refreshGoldDisplays();
 showScreen("menuScreen");
+document.getElementById("soundToggle").textContent = soundEnabled ? "🔊" : "🔇";
 setInterval(()=>spawnParticles(["#ef9f2218","#185fa218","#7f77dd18"][Math.floor(Math.random()*3)],1),3000);
