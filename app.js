@@ -4,35 +4,35 @@
    ════════════════════════════════════════════════════ */
 
 const CARDS=[
-  {name:"Mumen Rider",type:"Hero",faction:"hero",pr:1,rarity:"common",threat:"Nuisance · C-Rank",keyword:"Resilient",effect:"Remove 1 timeline card. Survives first combat loss.",flavor:'"He always shows up."'},
-  {name:"Grocery Store Sale",type:"Timeline",faction:"neutral",pr:null,rarity:"common",threat:"1 Turn",keyword:null,effect:"Standard timeline card, worth 1 turn.",flavor:'"20% off crab."'},
-  {name:"Mosquito",type:"Timeline",faction:"neutral",pr:null,rarity:"common",threat:"1 Turn",keyword:null,effect:"Standard timeline card, worth 1 turn.",flavor:'"It got away."'},
-  {name:"Nap Time",type:"Timeline",faction:"neutral",pr:null,rarity:"common",threat:"1 Turn",keyword:null,effect:"Standard timeline card, worth 1 turn.",flavor:'"He was almost there."'},
-  {name:"Tongue Stretcher",type:"Monster",faction:"monster",pr:1,rarity:"common",threat:"Wolf Tier",keyword:null,effect:"Add 1 timeline card. When destroyed, opponent discards 1 card.",flavor:'"Not every monster needs to be strong."'},
-  {name:"Frog Man",type:"Monster",faction:"monster",pr:1,rarity:"common",threat:"Wolf Tier",keyword:"Rush",effect:"Add 1 timeline card. Rush.",flavor:'"Leaps before it thinks."'},
-  {name:"Armored Gorilla",type:"Monster",faction:"monster",pr:1,rarity:"common",threat:"Wolf Tier",keyword:"Resilient",effect:"Add 1 timeline card. Resilient.",flavor:'"It wears its battles like a second skin."'},
-  {name:"Tank-Top Tiger",type:"Hero",faction:"hero",pr:1,rarity:"common",threat:"Nuisance · C-Rank",keyword:null,effect:"Remove 1 timeline card. Two Tank-Tops → PR 2.",flavor:'"There are more of us."'},
-  {name:"HA Dispatch",type:"Instant Event",faction:"hero",pr:null,rarity:"common",threat:"—",keyword:"Instant",effect:"Play any time. Recruit one additional unit this turn.",flavor:'"Response time: immediate."'},
-  {name:"Civilians Flee",type:"Field Event",faction:"monster",pr:null,rarity:"common",threat:"—",keyword:null,effect:"Add 1 timeline card. Wolf monsters gain PR 2.",flavor:'"Panic feeds them."'},
-  {name:"Amai Mask",type:"Hero",faction:"hero",pr:2,rarity:"uncommon",threat:"Threat · A-Rank",keyword:null,effect:"Remove 2 timeline cards. PR 1 heroes destroyed return to hand.",flavor:'"Beauty is just another form of control."'},
-  {name:"Beast King",type:"Monster",faction:"monster",pr:2,rarity:"uncommon",threat:"Dragon Tier",keyword:null,effect:"Add 2 timeline cards. All Wolf monsters gain PR 2.",flavor:'"Every wolf answers to its king."'},
-  {name:"S-City Under Siege",type:"Timeline",faction:"neutral",pr:null,rarity:"uncommon",threat:"2 Turns",keyword:"Summoned",effect:"Worth 2 turns. Requires PR 2+ hero to remove.",flavor:'"The city held longer than anyone expected."'},
-  {name:"King's Engine Roar",type:"Instant Event",faction:"hero",pr:null,rarity:"uncommon",threat:"—",keyword:"Instant",effect:"One monster must redirect its attack toward King.",flavor:'"The sound alone makes them reconsider."'},
-  {name:"Genos",type:"Hero",faction:"hero",pr:3,rarity:"rare",threat:"Serious Threat · S-Rank #14",keyword:"Overwhelm",effect:"Remove 3 timeline cards. Overwhelm. When destroyed, recruit one hero for free.",flavor:'"My purpose is to grow stronger."'},
-  {name:"Flashy Flash",type:"Hero",faction:"hero",pr:3,rarity:"rare",threat:"Serious Threat · S-Rank #13",keyword:"Rush · Lone Wolf",effect:"Remove 3 timeline cards. Rush. Lone Wolf: PR 4 when alone.",flavor:'"Speed that cannot be perceived cannot be defended."'},
-  {name:"Bang (Silver Fang)",type:"Hero",faction:"hero",pr:3,rarity:"rare",threat:"Serious Threat · S-Rank #3",keyword:"Resilient",effect:"Remove 3 timeline cards. Resilient. Targets cannot Guard against Bang's attacks.",flavor:'"The Water Stream Rock Smashing Fist."'},
-  {name:"Deep Sea King",type:"Monster",faction:"monster",pr:3,rarity:"rare",threat:"Dragon Tier (Named)",keyword:null,effect:"Add 3 timeline cards. While Rain is in play, PR becomes 5.",flavor:'"In the rain, even gods should kneel."'},
-  {name:"Carnage Kabuto",type:"Monster",faction:"monster",pr:3,rarity:"rare",threat:"Dragon Tier (Named)",keyword:"Overwhelm",effect:"Add 3 timeline cards. Overwhelm. PR +1 each turn it survives.",flavor:'"Genus called him a failure. Genus was wrong."'},
-  {name:"Tatsumaki",type:"Hero",faction:"hero",pr:4,rarity:"serious-rare",threat:"Calamity · S-Rank #2",keyword:"Overwhelm · Serious",effect:"Remove 4 timeline cards. Overwhelm. Counts toward win condition.",flavor:'"Don\'t get in my way."'},
-  {name:"King",type:"Hero",faction:"hero",pr:4,rarity:"serious-rare",threat:"Calamity · S-Rank #7",keyword:"Serious · Lone Wolf",effect:"All monsters must attack King while he stands. PR 5 alone.",flavor:'"The King Engine roars. They always hesitate."'},
-  {name:"Orochi, Monster King",type:"Monster",faction:"monster",pr:4,rarity:"serious-rare",threat:"Dragon+ Tier",keyword:"Serious",effect:"Add 4 timeline cards. All Dragon monsters gain Resilient.",flavor:'"The monster king does not beg. He commands."'},
-  {name:"Garou (Hero Hunter)",type:"Hero",faction:"both",pr:3,rarity:"serious-rare",threat:"Calamity · Monster",keyword:"Serious · Lone Wolf",effect:"Dual-faction. Remove or add 3 timeline cards. Lone Wolf: PR 4.",flavor:'"I don\'t fight for justice. I fight against it."'},
-  {name:"Elder Centipede",type:"Monster",faction:"monster",pr:5,rarity:"ssr",threat:"God-Tier / Dragon+",keyword:"Overwhelm · Serious",effect:"Add 5 timeline cards. Overwhelm. Once per game: survives destruction with PR 3.",flavor:'"It filled the entire horizon."'},
-  {name:"Garou (Monster Form)",type:"Monster",faction:"monster",pr:5,rarity:"ssr",threat:"God-Tier",keyword:"Rush · Lone Wolf · Serious",effect:"Add 5 timeline cards. Rush. Lone Wolf: PR 7. Once per game: negate Saitama reveal.",flavor:'"This is what a monster truly looks like."'},
-  {name:"Normal Punch",type:"Saitama",faction:"hero",pr:"∞",rarity:"saitama",threat:"Catastrophe",keyword:null,effect:"Win when counter reaches 0. It was enough.",flavor:'"It was enough."'},
-  {name:"Serious Punch",type:"Saitama",faction:"hero",pr:"∞",rarity:"saitama",threat:"Catastrophe",keyword:null,effect:"Win if 3+ Dragon-tier monsters were destroyed this game.",flavor:'"I\'ll show you what a serious hit looks like."'},
-  {name:"Serious Series: Serious Punch",type:"Saitama",faction:"hero",pr:"∞",rarity:"super-saitama",threat:"Beyond Catastrophe",keyword:null,effect:"Auto-win regardless of counter state — if chosen before the game.",flavor:'"It split the sky in two."'},
-  {name:"God",type:"Monster",faction:"monster",pr:"∞",rarity:"ssst",threat:"Beyond Classification",keyword:null,effect:"Both timelines reset to 7. All Relics destroyed. Draw 3 cards.",flavor:'"It offered power to those with nothing left."'},
+  {id:"001",name:"Mumen Rider",type:"Hero",faction:"hero",pr:1,rarity:"common",threat:"Nuisance · C-Rank",keyword:"Resilient",effect:"Remove 1 timeline card. Survives first combat loss.",flavor:'"He always shows up."'},
+  {id:"030",name:"Grocery Store Sale",type:"Timeline",faction:"neutral",pr:null,rarity:"common",threat:"1 Turn",keyword:null,effect:"Standard timeline card, worth 1 turn.",flavor:'"20% off crab."'},
+  {id:"031",name:"Mosquito",type:"Timeline",faction:"neutral",pr:null,rarity:"common",threat:"1 Turn",keyword:null,effect:"Standard timeline card, worth 1 turn.",flavor:'"It got away."'},
+  {id:"032",name:"Nap Time",type:"Timeline",faction:"neutral",pr:null,rarity:"common",threat:"1 Turn",keyword:null,effect:"Standard timeline card, worth 1 turn.",flavor:'"He was almost there."'},
+  {id:"011",name:"Tongue Stretcher",type:"Monster",faction:"monster",pr:1,rarity:"common",threat:"Wolf Tier",keyword:null,effect:"Add 1 timeline card. When destroyed, opponent discards 1 card.",flavor:'"Not every monster needs to be strong."'},
+  {id:"013",name:"Frog Man",type:"Monster",faction:"monster",pr:1,rarity:"common",threat:"Wolf Tier",keyword:"Rush",effect:"Add 1 timeline card. Rush.",flavor:'"Leaps before it thinks."'},
+  {id:"018",name:"Armored Gorilla",type:"Monster",faction:"monster",pr:1,rarity:"common",threat:"Wolf Tier",keyword:"Resilient",effect:"Add 1 timeline card. Resilient.",flavor:'"It wears its battles like a second skin."'},
+  {id:"002",name:"Tank-Top Tiger",type:"Hero",faction:"hero",pr:1,rarity:"common",threat:"Nuisance · C-Rank",keyword:null,effect:"Remove 1 timeline card. Two Tank-Tops → PR 2.",flavor:'"There are more of us."'},
+  {id:"021",name:"HA Dispatch",type:"Instant Event",faction:"hero",pr:null,rarity:"common",threat:"—",keyword:"Instant",effect:"Play any time. Recruit one additional unit this turn.",flavor:'"Response time: immediate."'},
+  {id:"025",name:"Civilians Flee",type:"Field Event",faction:"monster",pr:null,rarity:"common",threat:"—",keyword:null,effect:"Add 1 timeline card. Wolf monsters gain PR 2.",flavor:'"Panic feeds them."'},
+  {id:"055",name:"Amai Mask",type:"Hero",faction:"hero",pr:2,rarity:"uncommon",threat:"Threat · A-Rank",keyword:null,effect:"Remove 2 timeline cards. PR 1 heroes destroyed return to hand.",flavor:'"Beauty is just another form of control."'},
+  {id:"066",name:"Beast King",type:"Monster",faction:"monster",pr:2,rarity:"uncommon",threat:"Dragon Tier",keyword:null,effect:"Add 2 timeline cards. All Wolf monsters gain PR 2.",flavor:'"Every wolf answers to its king."'},
+  {id:"077",name:"S-City Under Siege",type:"Timeline",faction:"neutral",pr:null,rarity:"uncommon",threat:"2 Turns",keyword:"Summoned",effect:"Worth 2 turns. Requires PR 2+ hero to remove.",flavor:'"The city held longer than anyone expected."'},
+  {id:"072",name:"King's Engine Roar",type:"Instant Event",faction:"hero",pr:null,rarity:"uncommon",threat:"—",keyword:"Instant",effect:"One monster must redirect its attack toward King.",flavor:'"The sound alone makes them reconsider."'},
+  {id:"083",name:"Genos",type:"Hero",faction:"hero",pr:3,rarity:"rare",threat:"Serious Threat · S-Rank #14",keyword:"Overwhelm",effect:"Remove 3 timeline cards. Overwhelm. When destroyed, recruit one hero for free.",flavor:'"My purpose is to grow stronger."'},
+  {id:"087",name:"Flashy Flash",type:"Hero",faction:"hero",pr:3,rarity:"rare",threat:"Serious Threat · S-Rank #13",keyword:"Rush · Lone Wolf",effect:"Remove 3 timeline cards. Rush. Lone Wolf: PR 4 when alone.",flavor:'"Speed that cannot be perceived cannot be defended."'},
+  {id:"091",name:"Bang (Silver Fang)",type:"Hero",faction:"hero",pr:3,rarity:"rare",threat:"Serious Threat · S-Rank #3",keyword:"Resilient",effect:"Remove 3 timeline cards. Resilient. Targets cannot Guard against Bang's attacks.",flavor:'"The Water Stream Rock Smashing Fist."'},
+  {id:"097",name:"Deep Sea King",type:"Monster",faction:"monster",pr:3,rarity:"rare",threat:"Dragon Tier (Named)",keyword:null,effect:"Add 3 timeline cards. While Rain is in play, PR becomes 5.",flavor:'"In the rain, even gods should kneel."'},
+  {id:"094",name:"Carnage Kabuto",type:"Monster",faction:"monster",pr:3,rarity:"rare",threat:"Dragon Tier (Named)",keyword:"Overwhelm",effect:"Add 3 timeline cards. Overwhelm. PR +1 each turn it survives.",flavor:'"Genus called him a failure. Genus was wrong."'},
+  {id:"120",name:"Tatsumaki",type:"Hero",faction:"hero",pr:4,rarity:"serious-rare",threat:"Calamity · S-Rank #2",keyword:"Overwhelm · Serious",effect:"Remove 4 timeline cards. Overwhelm. Counts toward win condition.",flavor:'"Don\'t get in my way."'},
+  {id:"122",name:"King",type:"Hero",faction:"hero",pr:4,rarity:"serious-rare",threat:"Calamity · S-Rank #7",keyword:"Serious · Lone Wolf",effect:"All monsters must attack King while he stands. PR 5 alone.",flavor:'"The King Engine roars. They always hesitate."'},
+  {id:"124",name:"Orochi, Monster King",type:"Monster",faction:"monster",pr:4,rarity:"serious-rare",threat:"Dragon+ Tier",keyword:"Serious",effect:"Add 4 timeline cards. All Dragon monsters gain Resilient.",flavor:'"The monster king does not beg. He commands."'},
+  {id:"129",name:"Garou (Hero Hunter)",type:"Hero",faction:"both",pr:3,rarity:"serious-rare",threat:"Calamity · Monster",keyword:"Serious · Lone Wolf",effect:"Dual-faction. Remove or add 3 timeline cards. Lone Wolf: PR 4.",flavor:'"I don\'t fight for justice. I fight against it."'},
+  {id:"132",name:"Elder Centipede",type:"Monster",faction:"monster",pr:5,rarity:"ssr",threat:"God-Tier / Dragon+",keyword:"Overwhelm · Serious",effect:"Add 5 timeline cards. Overwhelm. Once per game: survives destruction with PR 3.",flavor:'"It filled the entire horizon."'},
+  {id:"133",name:"Garou (Monster Form)",type:"Monster",faction:"monster",pr:5,rarity:"ssr",threat:"God-Tier",keyword:"Rush · Lone Wolf · Serious",effect:"Add 5 timeline cards. Rush. Lone Wolf: PR 7. Once per game: negate Saitama reveal.",flavor:'"This is what a monster truly looks like."'},
+  {id:"134",name:"Normal Punch",type:"Saitama",faction:"hero",pr:"∞",rarity:"saitama",threat:"Catastrophe",keyword:null,effect:"Win when counter reaches 0. It was enough.",flavor:'"It was enough."'},
+  {id:"136",name:"Serious Punch",type:"Saitama",faction:"hero",pr:"∞",rarity:"saitama",threat:"Catastrophe",keyword:null,effect:"Win if 3+ Dragon-tier monsters were destroyed this game.",flavor:'"I\'ll show you what a serious hit looks like."'},
+  {id:"142",name:"Serious Series: Serious Punch",type:"Saitama",faction:"hero",pr:"∞",rarity:"super-saitama",threat:"Beyond Catastrophe",keyword:null,effect:"Auto-win regardless of counter state — if chosen before the game.",flavor:'"It split the sky in two."'},
+  {id:"143",name:"God",type:"Monster",faction:"monster",pr:"∞",rarity:"ssst",threat:"Beyond Classification",keyword:null,effect:"Both timelines reset to 7. All Relics destroyed. Draw 3 cards.",flavor:'"It offered power to those with nothing left."'},
 ];
 
 const RC={
@@ -174,8 +174,23 @@ function startReveal(){
   showScreen("revealScreen");
   renderCard(0);
 }
+function cardArtPath(card){
+  if(card.art)return card.art;
+  const slug=card.name.toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"");
+  const id=String(card.id||"").padStart(3,"0");
+  return id?`art/${id}_${slug}.png`:null;
+}
 function artSVG(card){
   const fac=FA[card.faction]||FA.hero,rc=RC[card.rarity]||RC.common;
+  const path=cardArtPath(card);
+  if(path){
+    return`<img src="${path}" alt="${card.name}" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none';this.nextSibling.style.display='block'"/>
+    <svg viewBox="0 0 196 142" style="width:100%;height:100%;display:none;">
+      <rect width="196" height="142" fill="${fac.bg}"/>
+      <circle cx="98" cy="85" r="50" fill="${rc.color}" opacity="0.06"/>
+      <text x="98" y="82" text-anchor="middle" dominant-baseline="middle" font-size="42">🃏</text>
+    </svg>`;
+  }
   const icons={Hero:"🦸",Monster:"👹",Saitama:"👊",Timeline:"⏳","Instant Event":"⚡","Field Event":"🌐",Relic:"🏺"};
   const ico=icons[card.type]||"🃏";
   return`<svg viewBox="0 0 196 142" style="width:100%;height:100%;display:block;">
