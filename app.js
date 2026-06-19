@@ -399,26 +399,30 @@ function renderCard(idx){
   const el=buildCard(card);
   wrap.appendChild(el);
   const hint=document.getElementById("tapHint");
-  if(revealedSet.has(idx)){setTimeout(()=>el.classList.remove("face-down"),50);hint.textContent="";}
-  else{
+  if(revealedSet.has(idx)){
+    setTimeout(()=>el.classList.remove("face-down"),50);
+    hint.textContent="TAP TO CONTINUE";
+    el.addEventListener("click",()=>{if(idx<pack.length-1)renderCard(idx+1);else showSummary();},{once:true});
+  } else{
     hint.textContent="TAP CARD TO REVEAL";
     el.addEventListener("click",()=>{
       if(el.classList.contains("face-down")){
         playCardFlip();
-        el.classList.remove("face-down");revealedSet.add(idx);hint.textContent="";
+        el.classList.remove("face-down");revealedSet.add(idx);hint.textContent="TAP AGAIN TO CONTINUE";
         spawnCardFlair(el, card);
         if(rc.flash){
           if(navigator.vibrate)navigator.vibrate(20);
           spawnParticles(rc.flash,18);
           showFlash(card);
-          // Rarity pull sound
           if(card.rarity==="ssst") playSound("pull_god");
           else if(card.rarity==="saitama"||card.rarity==="super-saitama") playSound("pull_saitama");
           else if(card.rarity==="ssr") playSound("pull_ssr");
           else if(card.rarity==="serious-rare"||card.rarity==="rare") playSound("pull_rare");
         }
+      } else {
+        if(idx<pack.length-1) renderCard(idx+1); else showSummary();
       }
-    },{once:true});
+    });
   }
 }
 /* ── CARD REVEAL FLAIR ── */
