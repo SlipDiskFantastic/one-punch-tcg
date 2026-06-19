@@ -178,7 +178,7 @@ function cardArtPath(card){
   if(card.art)return card.art;
   const slug=card.name.toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"");
   const id=String(card.id||"").padStart(3,"0");
-  return id?`art/${id}_${slug}.png`:null;
+  return id?`art/${id}_${slug}.jpg`:null;
 }
 function artSVG(card){
   const fac=FA[card.faction]||FA.hero,rc=RC[card.rarity]||RC.common;
