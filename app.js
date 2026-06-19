@@ -70,7 +70,7 @@ const PACK_PRICE={1:100,5:450,10:800};
 
 function getGold(){
   const v=localStorage.getItem("opm_gold");
-  if(v===null){localStorage.setItem("opm_gold","300");return 300;}
+  if(v===null){localStorage.setItem("opm_gold","1000");return 1000;}
   return parseInt(v,10)||0;
 }
 function setGold(n){localStorage.setItem("opm_gold",String(Math.max(0,n)));}
