@@ -47,19 +47,28 @@ body{
 
 /* ── MENU SCREEN ── */
 #menuScreen{gap:0;justify-content:flex-end;padding:0 0 32px;}
-.menu-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(239,159,39,0.12) 0%,transparent 65%);pointer-events:none;}
-.menu-pack-wrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative;width:100%;overflow:hidden;}
+
+/* Card wall mosaic background */
+.card-wall{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+.card-wall-tile{position:absolute;border-radius:8px;overflow:hidden;opacity:0.18;}
+.card-wall-tile img{width:100%;height:100%;object-fit:cover;display:block;}
+.card-wall-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(8,10,16,0.55) 0%,rgba(8,10,16,0.3) 40%,rgba(8,10,16,0.75) 75%,rgba(8,10,16,0.97) 100%);z-index:1;}
+
+.menu-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(239,159,39,0.12) 0%,transparent 65%);pointer-events:none;z-index:2;}
+.menu-pack-wrap{flex:1;display:flex;align-items:center;justify-content:center;position:relative;width:100%;overflow:hidden;z-index:3;}
 .menu-pack-img{width:220px;height:314px;object-fit:cover;border-radius:16px;box-shadow:0 0 60px rgba(239,159,39,0.25),0 20px 40px rgba(0,0,0,0.6);display:block;}
 .menu-pack-glow{position:absolute;width:220px;height:314px;border-radius:16px;box-shadow:0 0 80px rgba(239,159,39,0.18);pointer-events:none;}
-.menu-title{text-align:center;margin-bottom:28px;padding:0 20px;}
+.menu-title{text-align:center;margin-bottom:28px;padding:0 20px;z-index:3;position:relative;}
 .menu-title .mt1{font-family:'Cinzel Decorative',serif;font-size:9px;letter-spacing:0.28em;color:rgba(239,159,39,0.45);display:block;margin-bottom:8px;}
 .menu-title .mt2{font-size:30px;font-weight:700;letter-spacing:0.05em;color:#ef9f27;display:block;line-height:1;}
 .menu-title .mt3{font-size:12px;letter-spacing:0.18em;color:rgba(255,255,255,0.3);display:block;margin-top:6px;}
-.menu-buttons{width:100%;padding:0 20px;display:flex;flex-direction:column;gap:10px;}
+.menu-buttons{width:100%;padding:0 20px;display:flex;flex-direction:column;gap:10px;z-index:3;position:relative;}
 .menu-btn{width:100%;padding:0;border-radius:14px;font-family:'Cinzel',serif;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;transition:transform 0.12s,opacity 0.12s;}
 .menu-btn:active{transform:scale(0.97);opacity:0.88;}
 .menu-btn-pri{background:linear-gradient(135deg,#ef9f27,#d4841a);color:#080a10;}
 .menu-btn-sec{background:rgba(239,159,39,0.08);color:#ef9f27;border:1px solid rgba(239,159,39,0.22);}
+.menu-btn-ghost-nav{background:transparent;color:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.12);}
+.menu-btn-ghost-nav:hover{color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.22);}
 .mb-icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .mb-text{flex:1;text-align:left;padding:14px 0;}
 .mb-label{font-size:11px;letter-spacing:0.1em;line-height:1;}
@@ -67,7 +76,10 @@ body{
 .mb-badge{padding:4px 10px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:0.08em;margin-right:14px;flex-shrink:0;}
 .menu-btn-pri .mb-badge{background:rgba(0,0,0,0.18);color:#080a10;}
 .menu-btn-sec .mb-badge{background:rgba(239,159,39,0.12);color:#ef9f27;}
-.menu-set-label{font-size:8px;letter-spacing:0.1em;color:rgba(255,255,255,0.18);text-align:center;margin-top:14px;}
+.menu-set-label{font-size:8px;letter-spacing:0.1em;color:rgba(255,255,255,0.18);text-align:center;margin-top:14px;z-index:3;position:relative;}
+
+/* Gold balance badge */
+.gold-badge{position:absolute;top:14px;right:16px;z-index:10;display:flex;align-items:center;gap:5px;background:rgba(8,10,16,0.7);border:1px solid rgba(239,159,39,0.35);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;letter-spacing:0.06em;color:#ef9f27;backdrop-filter:blur(4px);}
 
 /* ── PACK SCREEN ── */
 .pack-title{text-align:center;margin-bottom:24px;}
@@ -185,6 +197,87 @@ body{
 .again-btn:active{opacity:0.85;}
 .menu-btn-ghost{width:100%;padding:13px;border-radius:12px;background:transparent;color:rgba(255,255,255,0.28);border:1px solid rgba(255,255,255,0.1);font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:0.1em;cursor:pointer;}
 .menu-btn-ghost:active{opacity:0.7;}
+.binder-added-line{font-size:10px;letter-spacing:0.06em;color:rgba(239,159,39,0.65);text-align:center;padding:4px 0;}
+
+/* ── BINDER SCREEN ── */
+#binderScreen{padding:0;justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#marketScreen{padding:0;justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+.screen-header{width:100%;display:flex;align-items:center;gap:10px;padding:14px 16px 12px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;position:sticky;top:0;background:#080a10;z-index:10;}
+.screen-header-back{background:none;border:none;color:rgba(255,255,255,0.45);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;flex-shrink:0;}
+.screen-header-back:active{color:#ef9f27;}
+.screen-header-title{flex:1;font-size:14px;font-weight:700;letter-spacing:0.14em;color:#ef9f27;}
+.screen-header-gold{font-size:12px;font-weight:700;letter-spacing:0.06em;color:#ef9f27;background:rgba(239,159,39,0.08);border:1px solid rgba(239,159,39,0.25);border-radius:16px;padding:4px 10px;}
+
+/* Binder stats */
+.binder-stats{width:100%;display:flex;gap:0;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.05);flex-shrink:0;}
+.binder-stat{flex:1;text-align:center;}
+.binder-stat-val{font-size:18px;font-weight:700;color:#ef9f27;display:block;}
+.binder-stat-label{font-size:8px;letter-spacing:0.1em;color:rgba(255,255,255,0.3);display:block;margin-top:2px;}
+
+/* Binder grid */
+.binder-grid{width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 12px 32px;flex:1;}
+.binder-tile{position:relative;border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:3/4;display:flex;flex-direction:column;transition:transform 0.12s,opacity 0.12s;}
+.binder-tile:active{transform:scale(0.95);opacity:0.85;}
+.binder-tile-art{width:100%;flex:1;overflow:hidden;position:relative;}
+.binder-tile-art img{width:100%;height:100%;object-fit:cover;display:block;}
+.binder-tile-art-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;}
+.binder-tile-footer{padding:4px 5px;background:inherit;}
+.binder-tile-name{font-size:7px;font-weight:700;letter-spacing:0.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+/* Count badge */
+.binder-count{position:absolute;top:4px;right:4px;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;padding:0 4px;line-height:1;}
+.binder-count.zero{background:rgba(80,80,80,0.7);color:rgba(255,255,255,0.4);}
+.binder-count.owned{background:#ef9f27;color:#080a10;}
+.binder-new{position:absolute;top:4px;left:4px;background:#ef9f27;color:#080a10;font-size:7px;font-weight:700;letter-spacing:0.08em;padding:2px 5px;border-radius:4px;}
+.binder-tile.not-owned{opacity:0.45;}
+
+/* Card modal / bottom sheet */
+.card-modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.65);z-index:50;display:flex;align-items:flex-end;justify-content:center;}
+.card-modal-overlay.hidden{display:none;}
+.card-modal{width:100%;max-width:430px;background:#0d0f1a;border-radius:20px 20px 0 0;border-top:1px solid rgba(239,159,39,0.25);padding:20px 20px 40px;display:flex;flex-direction:column;gap:12px;max-height:80vh;overflow-y:auto;}
+.card-modal-row{display:flex;gap:14px;align-items:flex-start;}
+.card-modal-art{width:80px;height:112px;border-radius:8px;overflow:hidden;flex-shrink:0;}
+.card-modal-art img{width:100%;height:100%;object-fit:cover;}
+.card-modal-info{flex:1;min-width:0;}
+.card-modal-name{font-size:14px;font-weight:700;letter-spacing:0.04em;margin-bottom:4px;}
+.card-modal-rarity{font-size:9px;font-weight:700;letter-spacing:0.1em;margin-bottom:6px;}
+.card-modal-type{font-size:10px;color:rgba(255,255,255,0.45);margin-bottom:4px;}
+.card-modal-count{font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:0.04em;}
+.card-modal-effect{font-size:9px;line-height:1.6;color:rgba(255,255,255,0.5);}
+.card-modal-flavor{font-size:8px;font-style:italic;color:rgba(255,255,255,0.25);line-height:1.5;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06);}
+.card-modal-sell-btn{width:100%;padding:13px;border-radius:10px;background:rgba(239,159,39,0.1);color:#ef9f27;border:1px solid rgba(239,159,39,0.3);font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:0.08em;cursor:pointer;}
+.card-modal-sell-btn:active{opacity:0.8;}
+.card-modal-close{width:100%;padding:10px;border-radius:10px;background:transparent;color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.1);font-family:'Cinzel',serif;font-size:10px;font-weight:600;letter-spacing:0.08em;cursor:pointer;}
+.card-modal-close:active{opacity:0.7;}
+
+/* ── MARKET SCREEN ── */
+.market-section{width:100%;padding:14px 16px 4px;flex-shrink:0;}
+.market-section-title{font-size:9px;font-weight:700;letter-spacing:0.14em;color:rgba(255,255,255,0.3);margin-bottom:10px;}
+.market-pack-btns{display:flex;flex-direction:column;gap:8px;padding:0 16px 16px;}
+.market-pack-btn{width:100%;padding:0;border-radius:12px;font-family:'Cinzel',serif;font-weight:700;cursor:pointer;border:none;display:flex;align-items:center;background:rgba(239,159,39,0.08);border:1px solid rgba(239,159,39,0.22);color:#ef9f27;transition:transform 0.12s,opacity 0.12s;}
+.market-pack-btn:active{transform:scale(0.97);opacity:0.88;}
+.market-pack-btn.disabled{opacity:0.3;pointer-events:none;}
+.market-pack-btn .mb-icon{font-size:18px;}
+.market-pack-btn .mb-text{padding:12px 0;}
+.market-pack-btn .mb-label{font-size:10px;}
+.market-pack-btn .mb-sub{font-size:8px;}
+.market-pack-btn .mb-badge{background:rgba(239,159,39,0.12);color:#ef9f27;font-size:9px;}
+.market-sell-all-btn{width:calc(100% - 32px);margin:0 16px;padding:12px;border-radius:10px;background:rgba(239,159,39,0.1);color:#ef9f27;border:1px solid rgba(239,159,39,0.28);font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:0.08em;cursor:pointer;margin-bottom:10px;}
+.market-sell-all-btn:active{opacity:0.8;}
+.market-dupe-list{width:100%;display:flex;flex-direction:column;gap:5px;padding:0 16px 40px;}
+.market-dupe-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.055);}
+.market-dupe-thumb{width:32px;height:45px;border-radius:5px;overflow:hidden;flex-shrink:0;}
+.market-dupe-thumb img{width:100%;height:100%;object-fit:cover;}
+.market-dupe-info{flex:1;min-width:0;}
+.market-dupe-name{font-size:10px;font-weight:600;color:rgba(255,255,255,0.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.market-dupe-rar{font-size:7.5px;font-weight:700;letter-spacing:0.06em;margin-top:2px;}
+.market-dupe-extra{font-size:8px;color:rgba(255,255,255,0.3);margin-top:1px;}
+.market-dupe-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+.market-dupe-price{font-size:10px;font-weight:700;color:#ef9f27;}
+.market-sell-btn{padding:5px 10px;border-radius:6px;background:rgba(239,159,39,0.12);color:#ef9f27;border:1px solid rgba(239,159,39,0.28);font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:0.06em;cursor:pointer;}
+.market-sell-btn:active{opacity:0.7;}
+.market-empty{padding:32px 16px;text-align:center;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.2);}
+
 .install-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:0.08em;color:rgba(255,255,255,0.15);text-align:center;z-index:5;white-space:nowrap;}
 </style>
 </head>
@@ -194,8 +287,13 @@ body{
 
 <!-- MENU SCREEN -->
 <div class="screen" id="menuScreen">
+  <!-- Card wall mosaic -->
+  <div class="card-wall" id="cardWall"></div>
+  <div class="card-wall-overlay"></div>
   <div class="menu-bg"></div>
-  <div class="menu-pack-wrap">
+  <!-- Gold badge -->
+  <div class="gold-badge" id="menuGold">🪙 0</div>
+  <div class="menu-pack-wrap" style="z-index:3;">
     <img class="menu-pack-img" src="pack.jpg" alt="OPM TCG Pack" onerror="this.style.display='none'">
     <div class="menu-pack-glow"></div>
   </div>
@@ -229,6 +327,15 @@ body{
       </div>
       <div class="mb-badge">×10</div>
     </button>
+    <!-- Nav buttons -->
+    <div style="display:flex;gap:8px;margin-top:2px;">
+      <button class="menu-btn menu-btn-ghost-nav" id="binderNavBtn" style="flex:1;padding:12px 0;border-radius:12px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:0.08em;cursor:pointer;">
+        📖 BINDER
+      </button>
+      <button class="menu-btn menu-btn-ghost-nav" id="marketNavBtn" style="flex:1;padding:12px 0;border-radius:12px;font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:0.08em;cursor:pointer;">
+        🏪 MARKET
+      </button>
+    </div>
   </div>
   <div class="menu-set-label">6C · 2U · 1R · 1 CHASE PER PACK</div>
 </div>
@@ -306,12 +413,95 @@ body{
     </div>
     <div class="bb-icon" id="bestIcon"></div>
   </div>
+  <div class="binder-added-line" id="binderAddedLine"></div>
   <div class="card-list" id="cardList"></div>
   <div class="sum-action-row">
     <button class="again-btn" id="againBtn">OPEN NEXT PACK</button>
     <button class="menu-btn-ghost" id="menuBtn">BACK TO MENU</button>
   </div>
 </div>
+
+<!-- BINDER SCREEN -->
+<div class="screen hidden" id="binderScreen">
+  <div class="screen-header">
+    <button class="screen-header-back" id="binderBackBtn">←</button>
+    <div class="screen-header-title">BINDER</div>
+    <div class="screen-header-gold" id="binderGold">🪙 0</div>
+  </div>
+  <div class="binder-stats">
+    <div class="binder-stat">
+      <span class="binder-stat-val" id="binderUnique">0 / 36</span>
+      <span class="binder-stat-label">UNIQUE</span>
+    </div>
+    <div class="binder-stat">
+      <span class="binder-stat-val" id="binderTotal">0</span>
+      <span class="binder-stat-label">TOTAL OWNED</span>
+    </div>
+  </div>
+  <div class="binder-grid" id="binderGrid"></div>
+  <!-- Card detail modal -->
+  <div class="card-modal-overlay hidden" id="cardModalOverlay">
+    <div class="card-modal" id="cardModal">
+      <div class="card-modal-row">
+        <div class="card-modal-art" id="cardModalArt"></div>
+        <div class="card-modal-info">
+          <div class="card-modal-name" id="cardModalName"></div>
+          <div class="card-modal-rarity" id="cardModalRarity"></div>
+          <div class="card-modal-type" id="cardModalType"></div>
+          <div class="card-modal-count" id="cardModalCount"></div>
+        </div>
+      </div>
+      <div class="card-modal-effect" id="cardModalEffect"></div>
+      <div class="card-modal-flavor" id="cardModalFlavor"></div>
+      <button class="card-modal-sell-btn" id="cardModalSellBtn" style="display:none;"></button>
+      <button class="card-modal-close" id="cardModalCloseBtn">CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<!-- MARKET SCREEN -->
+<div class="screen hidden" id="marketScreen">
+  <div class="screen-header">
+    <button class="screen-header-back" id="marketBackBtn">←</button>
+    <div class="screen-header-title">MARKET</div>
+    <div class="screen-header-gold" id="marketGold">🪙 0</div>
+  </div>
+  <div class="market-section">
+    <div class="market-section-title">BUY PACKS</div>
+  </div>
+  <div class="market-pack-btns">
+    <button class="market-pack-btn" id="mktBuy1">
+      <div class="mb-icon">👊</div>
+      <div class="mb-text">
+        <div class="mb-label">1 PACK</div>
+        <div class="mb-sub">10 cards · 1 guaranteed rare</div>
+      </div>
+      <div class="mb-badge">100g</div>
+    </button>
+    <button class="market-pack-btn" id="mktBuy5">
+      <div class="mb-icon">⚡</div>
+      <div class="mb-text">
+        <div class="mb-label">5 PACKS</div>
+        <div class="mb-sub">50 cards · 5 chases</div>
+      </div>
+      <div class="mb-badge">450g</div>
+    </button>
+    <button class="market-pack-btn" id="mktBuy10">
+      <div class="mb-icon">🔥</div>
+      <div class="mb-text">
+        <div class="mb-label">10 PACKS</div>
+        <div class="mb-sub">100 cards · guaranteed SSR+</div>
+      </div>
+      <div class="mb-badge">800g</div>
+    </button>
+  </div>
+  <div class="market-section">
+    <div class="market-section-title">SELL DUPLICATES</div>
+  </div>
+  <button class="market-sell-all-btn" id="mktSellAll">SELL ALL DUPES — 0g</button>
+  <div class="market-dupe-list" id="marketDupeList"></div>
+</div>
+
 </div>
 
 <script src="app.js"></script>

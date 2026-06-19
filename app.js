@@ -61,6 +61,86 @@ const RIP_STATES=[
   {id:"perfect",      weight:10, label:"PERFECT OPEN",     desc:"Collector quality. Nice.",         icon:"🏆", color:"#EF9F27", angle:"-1deg", jaggedAmp:1,  jagged:false, confetti:true},
 ];
 
+/* ── CURRENCY ── */
+const SELL_PRICE={
+  "common":5,"uncommon":20,"rare":75,"serious-rare":200,
+  "ssr":600,"saitama":1000,"super-saitama":3000,"ssst":10000
+};
+const PACK_PRICE={1:100,5:450,10:800};
+
+function getGold(){
+  const v=localStorage.getItem("opm_gold");
+  if(v===null){localStorage.setItem("opm_gold","300");return 300;}
+  return parseInt(v,10)||0;
+}
+function setGold(n){localStorage.setItem("opm_gold",String(Math.max(0,n)));}
+function addGold(n){setGold(getGold()+n);}
+function spendGold(n){
+  const g=getGold();
+  if(g<n)return false;
+  setGold(g-n);
+  return true;
+}
+function fmtGold(n){return n.toLocaleString();}
+
+/* ── BINDER ── */
+function getBinder(){
+  try{return JSON.parse(localStorage.getItem("opm_binder")||"{}");}
+  catch{return {};}
+}
+function saveBinder(b){localStorage.setItem("opm_binder",JSON.stringify(b));}
+function addToBinder(cards){
+  const b=getBinder();
+  cards.forEach(c=>{
+    const key=String(c.id).padStart(3,"0");
+    b[key]=(b[key]||0)+1;
+  });
+  saveBinder(b);
+}
+function binderCountFor(id){
+  const b=getBinder();
+  return b[String(id).padStart(3,"0")]||0;
+}
+
+/* ── GOLD DISPLAY ── */
+function refreshGoldDisplays(){
+  const g=getGold();
+  const txt="🪙 "+fmtGold(g);
+  document.getElementById("menuGold").textContent=txt;
+  document.getElementById("binderGold").textContent=txt;
+  document.getElementById("marketGold").textContent=txt;
+}
+
+/* ── CARD WALL MOSAIC ── */
+const WALL_ARTS=[
+  "132_elder_centipede","133_garou_monster_form","120_tatsumaki_terrible_tornado",
+  "143_god","083_genos","087_flashy_flash","091_bang_silver_fang","122_king",
+  "124_orochi_monster_king","129_garou_hero_hunter","097_deep_sea_king","094_carnage_kabuto"
+];
+const WALL_ROTATIONS=[-8,-5,-3,2,4,6,-6,3,-2,7,-4,5];
+function buildCardWall(){
+  const wall=document.getElementById("cardWall");
+  if(!wall)return;
+  wall.innerHTML="";
+  const count=WALL_ARTS.length;
+  // Lay tiles in a roughly 4-col grid scattered
+  const cols=4;
+  const tileW=90,tileH=120;
+  const cols_pos=[0,95,190,285,-10,90,185,280,5,98,193,288];
+  const rows_pos=[0,0,0,0,115,115,115,115,230,230,230,230];
+  for(let i=0;i<count;i++){
+    const tile=document.createElement("div");
+    tile.className="card-wall-tile";
+    const rot=WALL_ROTATIONS[i%WALL_ROTATIONS.length];
+    tile.style.cssText=`width:${tileW}px;height:${tileH}px;left:${cols_pos[i]}px;top:${rows_pos[i]-10}px;transform:rotate(${rot}deg);`;
+    const img=document.createElement("img");
+    img.src=`art/${WALL_ARTS[i]}.jpg`;
+    img.alt="";
+    tile.appendChild(img);
+    wall.appendChild(tile);
+  }
+}
+
 function pickRip(){
   const total=RIP_STATES.reduce((s,r)=>s+r.weight,0);
   let rnd=Math.random()*total;
@@ -266,12 +346,29 @@ document.getElementById("skipAll").addEventListener("click",()=>{pack.forEach((_
 
 /* ── SUMMARY ── */
 function showSummary(){
+  // Increment counters and compute isLastPack FIRST before using them
+  packsOpened++;
+  allPulledCards.push(...pack);
+  const isLastPack=packsOpened>=packsToOpen;
+  const displayCards=isLastPack&&packsToOpen>1?allPulledCards:pack;
+
+  // Add to binder on last pack (or single pack)
+  if(isLastPack){
+    addToBinder(displayCards);
+    refreshGoldDisplays();
+    const addedLine=document.getElementById("binderAddedLine");
+    addedLine.textContent=`${displayCards.length} card${displayCards.length!==1?"s":""} added to binder`;
+  } else {
+    document.getElementById("binderAddedLine").textContent="";
+  }
+
   const rip=currentRip||RIP_STATES[2];
   document.getElementById("rrIcon").textContent=rip.icon;
   document.getElementById("rrQuality").textContent=rip.label;
   document.getElementById("rrQuality").style.color=rip.color;
   document.getElementById("rrDesc").textContent=rip.desc;
-  const best=(isLastPack&&packsToOpen>1?allPulledCards:pack).reduce((b,c)=>RO.indexOf(c.rarity)>RO.indexOf(b.rarity)?c:b);
+
+  const best=displayCards.reduce((b,c)=>RO.indexOf(c.rarity)>RO.indexOf(b.rarity)?c:b);
   const brc=RC[best.rarity];
   const banner=document.getElementById("bestBanner");
   banner.style.background=brc.color+"12";
@@ -281,11 +378,6 @@ function showSummary(){
   document.getElementById("bestRarLabel").textContent=brc.label;
   document.getElementById("bestRarLabel").style.color=brc.color;
   document.getElementById("bestIcon").textContent=["ssr","super-saitama","ssst"].includes(best.rarity)?"🔥":best.rarity==="saitama"?"👊":"⭐";
-  // Accumulate cards across packs
-  packsOpened++;
-  allPulledCards.push(...pack);
-  const isLastPack=packsOpened>=packsToOpen;
-  const displayCards=isLastPack&&packsToOpen>1?allPulledCards:pack;
 
   // Title + subtitle
   document.getElementById("sumTitle").textContent=isLastPack&&packsToOpen>1?"ALL PACKS OPENED":"PACK OPENED";
@@ -303,8 +395,6 @@ function showSummary(){
   }
   menuBtn.style.display="block";
 
-  // Best pull across all displayed cards
-  const bestPool=displayCards;
   document.getElementById("cardList").innerHTML=displayCards.map(card=>{
     const rc=RC[card.rarity],fac=FA[card.faction]||FA.hero;
     const prStr=card.pr!==null?String(card.pr):"";
@@ -341,10 +431,13 @@ function spawnConfetti(){
 }
 
 /* ── SCREENS ── */
-const ALL_SCREENS=["menuScreen","packScreen","revealScreen","summaryScreen"];
+const ALL_SCREENS=["menuScreen","packScreen","revealScreen","summaryScreen","binderScreen","marketScreen"];
 function showScreen(id){
   ALL_SCREENS.forEach(s=>{document.getElementById(s).classList.toggle("hidden",s!==id);});
   if(id==="summaryScreen")document.getElementById("summaryScreen").scrollTop=0;
+  if(id==="binderScreen"){renderBinderScreen();document.getElementById("binderScreen").scrollTop=0;}
+  if(id==="marketScreen"){renderMarketScreen();document.getElementById("marketScreen").scrollTop=0;}
+  if(id==="menuScreen"){refreshGoldDisplays();}
 }
 
 /* ── MULTI-PACK STATE ── */
@@ -369,17 +462,210 @@ function resetPackScreen(){
   pullInstruction.textContent="SLIDE DOWN TO OPEN";
   document.getElementById("tearEdgeSVG").innerHTML="";
   setTimeout(()=>{packTop.style.transition="";},50);
-  // Update pack counter label
   const lbl=document.getElementById("packCounterLabel");
   if(packsToOpen>1){lbl.textContent=`PACK ${packsOpened+1} OF ${packsToOpen}`;}
   else{lbl.textContent="";}
   initPackDimensions();
 }
 
+/* ── BINDER SCREEN ── */
+let currentModalCard=null;
+
+function renderBinderScreen(){
+  const b=getBinder();
+  const sorted=[...CARDS].sort((a,z)=>RO.indexOf(z.rarity)-RO.indexOf(a.rarity));
+  // Stats
+  const totalUnique=Object.keys(b).filter(k=>b[k]>0).length;
+  const totalOwned=Object.values(b).reduce((s,n)=>s+n,0);
+  document.getElementById("binderUnique").textContent=`${totalUnique} / ${CARDS.length}`;
+  document.getElementById("binderTotal").textContent=String(totalOwned);
+  refreshGoldDisplays();
+  // Grid
+  const grid=document.getElementById("binderGrid");
+  grid.innerHTML="";
+  sorted.forEach(card=>{
+    const rc=RC[card.rarity]||RC.common;
+    const fac=FA[card.faction]||FA.hero;
+    const cnt=binderCountFor(card.id);
+    const owned=cnt>0;
+    const tile=document.createElement("div");
+    tile.className="binder-tile"+(owned?"":" not-owned");
+    tile.style.cssText=`border:2px solid ${rc.color}${owned?"55":"22"};background:${rc.bg};`;
+    const artPath=cardArtPath(card);
+    const artHtml=artPath
+      ?`<img src="${artPath}" alt="${card.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'">`
+      :`<div class="binder-tile-art-placeholder" style="background:${fac.bg};color:${fac.col};height:100%;">🃏</div>`;
+    // Count badge
+    let badgeHtml="";
+    if(!owned){badgeHtml=`<div class="binder-count zero">0</div>`;}
+    else if(cnt===1){badgeHtml=`<div class="binder-new">NEW</div><div class="binder-count owned">1</div>`;}
+    else{badgeHtml=`<div class="binder-count owned">${cnt}</div>`;}
+    tile.innerHTML=`
+      <div class="binder-tile-art" style="flex:1;position:relative;">${artHtml}${badgeHtml}</div>
+      <div class="binder-tile-footer" style="background:${rc.bg};border-top:1px solid ${rc.color}22;">
+        <div class="binder-tile-name" style="color:${rc.dim};">${card.name}</div>
+      </div>`;
+    tile.addEventListener("click",()=>openCardModal(card));
+    grid.appendChild(tile);
+  });
+}
+
+function openCardModal(card){
+  currentModalCard=card;
+  const rc=RC[card.rarity]||RC.common;
+  const cnt=binderCountFor(card.id);
+  document.getElementById("cardModalName").textContent=card.name;
+  document.getElementById("cardModalName").style.color=rc.dim;
+  document.getElementById("cardModalRarity").textContent=rc.label;
+  document.getElementById("cardModalRarity").style.color=rc.color;
+  document.getElementById("cardModalType").textContent=`${card.type} · ${card.threat}`;
+  document.getElementById("cardModalCount").textContent=cnt>0?`Owned: ${cnt}`:"Not owned";
+  document.getElementById("cardModalEffect").textContent=card.effect;
+  document.getElementById("cardModalFlavor").textContent=card.flavor;
+  // Art
+  const artDiv=document.getElementById("cardModalArt");
+  artDiv.style.border=`2px solid ${rc.color}55`;
+  const artPath=cardArtPath(card);
+  artDiv.innerHTML=artPath?`<img src="${artPath}" alt="${card.name}" style="width:100%;height:100%;object-fit:cover;">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;background:${(FA[card.faction]||FA.hero).bg};">🃏</div>`;
+  // Sell button
+  const sellBtn=document.getElementById("cardModalSellBtn");
+  if(cnt>1){
+    const price=SELL_PRICE[card.rarity]||5;
+    const dupes=cnt-1;
+    sellBtn.style.display="block";
+    sellBtn.textContent=`SELL DUPE (${fmtGold(price)}g)`;
+    sellBtn.onclick=()=>{
+      const b=getBinder();
+      const key=String(card.id).padStart(3,"0");
+      if((b[key]||0)>1){
+        b[key]--;
+        saveBinder(b);
+        addGold(price);
+        refreshGoldDisplays();
+        openCardModal(card);// refresh modal
+        renderBinderScreen();
+      }
+    };
+  } else {
+    sellBtn.style.display="none";
+  }
+  document.getElementById("cardModalOverlay").classList.remove("hidden");
+}
+function closeCardModal(){
+  document.getElementById("cardModalOverlay").classList.add("hidden");
+  currentModalCard=null;
+}
+document.getElementById("cardModalCloseBtn").addEventListener("click",closeCardModal);
+document.getElementById("cardModalOverlay").addEventListener("click",(e)=>{
+  if(e.target===document.getElementById("cardModalOverlay"))closeCardModal();
+});
+
+/* ── MARKET SCREEN ── */
+function renderMarketScreen(){
+  const g=getGold();
+  refreshGoldDisplays();
+  // Update buy buttons
+  const prices={mktBuy1:100,mktBuy5:450,mktBuy10:800};
+  const counts={mktBuy1:1,mktBuy5:5,mktBuy10:10};
+  Object.keys(prices).forEach(id=>{
+    const btn=document.getElementById(id);
+    if(g<prices[id])btn.classList.add("disabled");
+    else btn.classList.remove("disabled");
+  });
+  // Sell all
+  const b=getBinder();
+  let totalDupeGold=0;
+  CARDS.forEach(card=>{
+    const cnt=binderCountFor(card.id);
+    if(cnt>1){totalDupeGold+=(cnt-1)*(SELL_PRICE[card.rarity]||5);}
+  });
+  const sellAllBtn=document.getElementById("mktSellAll");
+  if(totalDupeGold===0){
+    sellAllBtn.textContent="SELL ALL DUPES — 0g";
+    sellAllBtn.style.opacity="0.4";
+    sellAllBtn.style.pointerEvents="none";
+  } else {
+    sellAllBtn.textContent=`SELL ALL DUPES — ${fmtGold(totalDupeGold)}g`;
+    sellAllBtn.style.opacity="1";
+    sellAllBtn.style.pointerEvents="auto";
+  }
+  // Dupe list
+  const list=document.getElementById("marketDupeList");
+  list.innerHTML="";
+  const dupes=CARDS.filter(card=>binderCountFor(card.id)>1).sort((a,z)=>RO.indexOf(z.rarity)-RO.indexOf(a.rarity));
+  if(dupes.length===0){
+    list.innerHTML=`<div class="market-empty">No duplicates to sell.<br>Open more packs!</div>`;
+    return;
+  }
+  dupes.forEach(card=>{
+    const rc=RC[card.rarity]||RC.common;
+    const cnt=binderCountFor(card.id);
+    const extras=cnt-1;
+    const price=SELL_PRICE[card.rarity]||5;
+    const artPath=cardArtPath(card);
+    const row=document.createElement("div");
+    row.className="market-dupe-row";
+    row.innerHTML=`
+      <div class="market-dupe-thumb" style="border:1px solid ${rc.color}44;">
+        ${artPath?`<img src="${artPath}" alt="${card.name}">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;background:${(FA[card.faction]||FA.hero).bg};">🃏</div>`}
+      </div>
+      <div class="market-dupe-info">
+        <div class="market-dupe-name">${card.name}</div>
+        <div class="market-dupe-rar" style="color:${rc.color};">${rc.label}</div>
+        <div class="market-dupe-extra">×${extras} extra</div>
+      </div>
+      <div class="market-dupe-right">
+        <div class="market-dupe-price">🪙${fmtGold(price)}</div>
+        <button class="market-sell-btn" data-id="${card.id}">SELL 1</button>
+      </div>`;
+    row.querySelector(".market-sell-btn").addEventListener("click",()=>{
+      const b2=getBinder();
+      const key=String(card.id).padStart(3,"0");
+      if((b2[key]||0)>1){
+        b2[key]--;
+        saveBinder(b2);
+        addGold(price);
+        renderMarketScreen();
+      }
+    });
+    list.appendChild(row);
+  });
+}
+
+// Sell all dupes
+document.getElementById("mktSellAll").addEventListener("click",()=>{
+  const b=getBinder();
+  let earned=0;
+  CARDS.forEach(card=>{
+    const key=String(card.id).padStart(3,"0");
+    const cnt=b[key]||0;
+    if(cnt>1){const dupes=cnt-1;earned+=dupes*(SELL_PRICE[card.rarity]||5);b[key]=1;}
+  });
+  saveBinder(b);
+  addGold(earned);
+  renderMarketScreen();
+});
+
+// Market buy buttons
+function setupMarketBuyBtn(btnId,count,price){
+  document.getElementById(btnId).addEventListener("click",()=>{
+    if(getGold()<price)return;
+    if(spendGold(price)){
+      refreshGoldDisplays();
+      startSession(count);
+    }
+  });
+}
+setupMarketBuyBtn("mktBuy1",1,100);
+setupMarketBuyBtn("mktBuy5",5,450);
+setupMarketBuyBtn("mktBuy10",10,800);
+
 /* ── MENU WIRING ── */
 document.getElementById("open1Btn").addEventListener("click",()=>startSession(1));
 document.getElementById("open5Btn").addEventListener("click",()=>startSession(5));
 document.getElementById("open10Btn").addEventListener("click",()=>startSession(10));
+document.getElementById("binderNavBtn").addEventListener("click",()=>showScreen("binderScreen"));
+document.getElementById("marketNavBtn").addEventListener("click",()=>showScreen("marketScreen"));
 
 /* ── AGAIN / MENU BUTTONS ── */
 document.getElementById("againBtn").addEventListener("click",()=>{
@@ -389,9 +675,13 @@ document.getElementById("againBtn").addEventListener("click",()=>{
 document.getElementById("menuBtn").addEventListener("click",()=>{
   showScreen("menuScreen");
 });
+document.getElementById("binderBackBtn").addEventListener("click",()=>showScreen("menuScreen"));
+document.getElementById("marketBackBtn").addEventListener("click",()=>showScreen("menuScreen"));
 
 /* ── INIT ── */
+buildCardWall();
 initPackDimensions();
 buildTearEdge(RIP_STATES[2]);
+refreshGoldDisplays();
 showScreen("menuScreen");
 setInterval(()=>spawnParticles(["#ef9f2218","#185fa218","#7f77dd18"][Math.floor(Math.random()*3)],1),3000);
