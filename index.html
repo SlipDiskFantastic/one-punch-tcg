@@ -279,6 +279,9 @@ body{
 .market-empty{padding:32px 16px;text-align:center;font-size:11px;letter-spacing:0.08em;color:rgba(255,255,255,0.2);}
 
 .install-hint{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:0.08em;color:rgba(255,255,255,0.15);text-align:center;z-index:5;white-space:nowrap;}
+@keyframes flairPop{0%{transform:translate(-50%,-50%) translate(0,0);opacity:1;}100%{transform:translate(-50%,-50%) translate(var(--tx),var(--ty));opacity:0;}}
+@keyframes ringPulse{0%{opacity:1;transform:translate(-50%,-50%) scale(1);}100%{opacity:0;transform:translate(-50%,-50%) scale(1.4);}}
+@keyframes screenTint{0%{opacity:1;}100%{opacity:0;}}
 </style>
 </head>
 <body>

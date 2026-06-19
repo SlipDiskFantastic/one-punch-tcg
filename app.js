@@ -92,15 +92,25 @@ function playSound(name, volume = 1) {
   a.play().catch(() => {});
 }
 
+let bgPending = null;
 function playBg(name) {
   if (BG.name === name) return;
   if (BG.node) { BG.node.pause(); BG.node.currentTime = 0; }
-  if (!soundEnabled || !SFX[name]) { BG.name = name; return; }
-  BG.node = SFX[name];
   BG.name = name;
+  if (!soundEnabled || !SFX[name]) return;
+  BG.node = SFX[name];
   BG.node.currentTime = 0;
-  BG.node.play().catch(() => {});
+  BG.node.play().catch(() => { bgPending = name; });
 }
+// Resume bg music after first user interaction (browser autoplay policy)
+document.addEventListener("click", function resumeBg() {
+  if (bgPending && soundEnabled && SFX[bgPending]) {
+    BG.node = SFX[bgPending];
+    BG.node.play().catch(() => {});
+    bgPending = null;
+  }
+  document.removeEventListener("click", resumeBg);
+}, { once: true });
 
 function toggleSound() {
   soundEnabled = !soundEnabled;
@@ -324,13 +334,6 @@ function startReveal(){
   const title=packsToOpen>1?`PACK ${packsOpened+1} OF ${packsToOpen}`:"OPENING PACK";
   document.getElementById("revealTitle").textContent=title;
   showScreen("revealScreen");
-  // Determine best rarity in pack and play appropriate sting
-  const bestCard=pack.reduce((b,c)=>RO.indexOf(c.rarity)>RO.indexOf(b.rarity)?c:b);
-  const bestRarity=bestCard.rarity;
-  if(["ssr","saitama","super-saitama","ssst"].includes(bestRarity)) playSound("sting_saitama");
-  else if(["rare","serious-rare"].includes(bestRarity)) playSound("sting_rare");
-  else playSound("sting_pack");
-  playSound("pack_open",0.7);
   renderCard(0);
 }
 function cardArtPath(card){
@@ -403,6 +406,7 @@ function renderCard(idx){
       if(el.classList.contains("face-down")){
         playCardFlip();
         el.classList.remove("face-down");revealedSet.add(idx);hint.textContent="";
+        spawnCardFlair(el, card);
         if(rc.flash){
           if(navigator.vibrate)navigator.vibrate(20);
           spawnParticles(rc.flash,18);
@@ -417,6 +421,79 @@ function renderCard(idx){
     },{once:true});
   }
 }
+/* ── CARD REVEAL FLAIR ── */
+function spawnCardFlair(el, card){
+  const rc=RC[card.rarity];
+  const r=card.rarity;
+  if(!["rare","serious-rare","ssr","saitama","super-saitama","ssst"].includes(r))return;
+
+  const rect=el.getBoundingClientRect();
+  const cx=rect.left+rect.width/2;
+  const cy=rect.top+rect.height/2;
+  const c=document.getElementById("particles");
+
+  // Configs per rarity
+  const cfg={
+    "rare":          {count:18, colors:["#85b7eb","#c8e0ff","#4a90d9"], size:[3,6],  drift:70,  rise:120, dur:[0.8,1.4]},
+    "serious-rare":  {count:26, colors:["#ef9f27","#fac775","#ffe0a0"], size:[4,8],  drift:90,  rise:150, dur:[0.9,1.6]},
+    "ssr":           {count:34, colors:["#D85A30","#f0997b","#ff6b3d"], size:[4,9],  drift:110, rise:180, dur:[1.0,1.8]},
+    "saitama":       {count:40, colors:["#ef9f27","#ffffff","#fac775"], size:[4,10], drift:130, rise:200, dur:[1.0,2.0]},
+    "super-saitama": {count:48, colors:["#D4537E","#f4c0d1","#ff85b3"], size:[5,11], drift:140, rise:220, dur:[1.1,2.1]},
+    "ssst":          {count:56, colors:["#7F77DD","#afa9ec","#ffffff"], size:[5,12], drift:160, rise:250, dur:[1.2,2.4]},
+  }[r];
+
+  for(let i=0;i<cfg.count;i++){
+    const p=document.createElement("div");
+    const sz=cfg.size[0]+Math.random()*(cfg.size[1]-cfg.size[0]);
+    const angle=Math.random()*Math.PI*2;
+    const dist=30+Math.random()*cfg.drift;
+    const tx=(Math.cos(angle)*dist).toFixed(1);
+    const ty=(-cfg.rise*0.3-Math.random()*cfg.rise).toFixed(1);
+    const color=cfg.colors[Math.floor(Math.random()*cfg.colors.length)];
+    const dur=(cfg.dur[0]+Math.random()*(cfg.dur[1]-cfg.dur[0])).toFixed(2);
+    const delay=(Math.random()*0.3).toFixed(2);
+    const shape=Math.random()>0.4?"50%":`${2+Math.floor(Math.random()*3)}px`;
+    p.style.cssText=`
+      position:fixed;pointer-events:none;z-index:999;
+      width:${sz}px;height:${sz}px;
+      background:${color};
+      border-radius:${shape};
+      left:${cx}px;top:${cy}px;
+      transform:translate(-50%,-50%);
+      animation:flairPop ${dur}s ${delay}s cubic-bezier(0.2,0.8,0.4,1) forwards;
+      --tx:${tx}px;--ty:${ty}px;
+      box-shadow:0 0 ${sz*1.5}px ${color}99;
+    `;
+    c.appendChild(p);
+    setTimeout(()=>p.remove(),(parseFloat(dur)+parseFloat(delay)+0.1)*1000);
+  }
+
+  // Glow ring pulse on card for SSR+
+  if(["ssr","saitama","super-saitama","ssst"].includes(r)){
+    const ring=document.createElement("div");
+    ring.style.cssText=`
+      position:fixed;pointer-events:none;z-index:998;
+      left:${cx}px;top:${cy}px;
+      width:${rect.width+20}px;height:${rect.height+20}px;
+      transform:translate(-50%,-50%);
+      border-radius:16px;
+      border:2px solid ${rc.color};
+      box-shadow:0 0 24px ${rc.color},inset 0 0 24px ${rc.color}44;
+      animation:ringPulse 0.7s ease-out forwards;
+    `;
+    document.getElementById("particles").appendChild(ring);
+    setTimeout(()=>ring.remove(),800);
+  }
+
+  // Screen tint flash for God card
+  if(r==="ssst"){
+    const tint=document.createElement("div");
+    tint.style.cssText=`position:fixed;inset:0;pointer-events:none;z-index:997;background:${rc.color}22;animation:screenTint 1.2s ease-out forwards;`;
+    document.body.appendChild(tint);
+    setTimeout(()=>tint.remove(),1300);
+  }
+}
+
 function showFlash(card){
   const rc=RC[card.rarity],fl=document.getElementById("rarFlash");
   document.getElementById("rfTitle").textContent=rc.label.toUpperCase();
