@@ -211,6 +211,7 @@ function buildCardWall(){
     const rot=WALL_ROTATIONS[i%WALL_ROTATIONS.length];
     tile.style.cssText=`width:${tileW}px;height:${tileH}px;left:${cols_pos[i]}px;top:${rows_pos[i]-10}px;transform:rotate(${rot}deg);`;
     const img=document.createElement("img");
+    img.loading="lazy";
     img.src=`art/${WALL_ARTS[i]}.jpg`;
     img.alt="";
     tile.appendChild(img);
@@ -369,6 +370,7 @@ function buildCard(card){
     <div class="card-back"><div class="back-grid"></div><div class="back-inner"><div class="bi-icon">👊</div><div class="bi-name">ONE PUNCH TCG</div><div class="bi-sub">MONSTER ARC</div></div></div>
     <div class="card-face" style="background:${fac.bg};border:2px solid ${rc.foil?rc.color:rc.color+'55'};box-shadow:${rc.foil?`0 0 22px ${rc.color}33`:'none'};">
       ${rc.foil?'<div class="foil-sheen"></div>':""}
+      <div class="card-glare"></div>
       <div class="card-art">${artSVG(card)}</div>
       <div class="card-nameplate"><div class="cnb"><div class="cname" style="color:${fac.col};">${card.name}</div><div class="csub" style="color:${fac.col};">${card.threat}</div></div>
       <div class="pr-circ" style="background:${rc.color}18;border:1px solid ${rc.color}55;color:${rc.dim};font-size:${prStr==="∞"?"13px":"11px"};">${prStr}</div></div>
@@ -379,6 +381,57 @@ function buildCard(card){
     </div>`;
   return el;
 }
+/* ── 3D TILT EFFECT ── */
+function addTiltEffect(el){
+  const MAX=18, SCALE_HOVER=1.06;
+  const glare=el.querySelector(".card-glare");
+  const sheen=el.querySelector(".foil-sheen");
+  let rafId=null, tx=0, ty=0, cx=0, cy=0, hovering=false;
+  function lerp(a,b,t){return a+(b-a)*t;}
+  function tick(){
+    cx=lerp(cx,tx,0.1); cy=lerp(cy,ty,0.1);
+    const scale=hovering?SCALE_HOVER:1;
+    el.style.transform=`rotateX(${cy}deg) rotateY(${cx}deg) scale(${scale})`;
+    // Glare: position radial highlight at reflection point
+    if(glare){
+      const gx=50+cx/MAX*30, gy=50+cy/MAX*30;
+      glare.style.background=`radial-gradient(circle at ${gx}% ${gy}%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.06) 40%, transparent 65%)`;
+      glare.style.opacity=hovering?String(Math.hypot(cx,cy)/MAX*0.9):"0";
+    }
+    // Shift foil sheen with tilt
+    if(sheen){
+      const sx=50+cx/MAX*80, sy=50+cy/MAX*80;
+      sheen.style.backgroundPosition=`${sx}% ${sy}%`;
+    }
+    const done=Math.abs(cx-tx)<0.05&&Math.abs(cy-ty)<0.05;
+    if(!done){rafId=requestAnimationFrame(tick);}
+    else{
+      rafId=null;
+      if(!hovering){el.style.transform="";if(glare)glare.style.opacity="0";if(sheen)sheen.style.backgroundPosition="";}
+    }
+  }
+  function start(){hovering=true;el.style.transition="none";}
+  function move(e){
+    const r=el.getBoundingClientRect();
+    const mx=e.touches?e.touches[0].clientX:e.clientX;
+    const my=e.touches?e.touches[0].clientY:e.clientY;
+    tx=((mx-(r.left+r.width/2))/(r.width/2))*MAX;
+    ty=-((my-(r.top+r.height/2))/(r.height/2))*MAX;
+    if(!rafId)rafId=requestAnimationFrame(tick);
+  }
+  function end(){
+    hovering=false; tx=0; ty=0;
+    el.style.transition="transform 0.65s cubic-bezier(0.34,1.1,0.64,1)";
+    if(!rafId)rafId=requestAnimationFrame(tick);
+  }
+  el.addEventListener("mouseenter",start);
+  el.addEventListener("mousemove",move);
+  el.addEventListener("mouseleave",end);
+  el.addEventListener("touchstart",start,{passive:true});
+  el.addEventListener("touchmove",move,{passive:true});
+  el.addEventListener("touchend",end);
+}
+
 function renderCard(idx){
   curIdx=idx;
   const card=pack[idx],rc=RC[card.rarity];
@@ -392,7 +445,7 @@ function renderCard(idx){
   wrap.appendChild(el);
   const hint=document.getElementById("tapHint");
   if(revealedSet.has(idx)){
-    setTimeout(()=>el.classList.remove("face-down"),50);
+    setTimeout(()=>{el.classList.remove("face-down");addTiltEffect(el);},80);
     hint.textContent="TAP TO CONTINUE";
     el.addEventListener("click",()=>{if(idx<pack.length-1)renderCard(idx+1);else showSummary();},{once:true});
   } else{
@@ -413,8 +466,8 @@ function renderCard(idx){
           else if(card.rarity==="ssr") playSound("pull_ssr");
           else if(card.rarity==="serious-rare"||card.rarity==="rare") playSound("pull_rare");
         }
-        // Allow advance only after flip animation completes (0.58s)
-        setTimeout(()=>{ canAdvance=true; hint.textContent="TAP TO CONTINUE"; }, 620);
+        // Allow advance only after flip animation completes (0.58s), then enable tilt
+        setTimeout(()=>{ canAdvance=true; hint.textContent="TAP TO CONTINUE"; addTiltEffect(el); }, 620);
       } else if(canAdvance){
         if(idx<pack.length-1) renderCard(idx+1); else showSummary();
       }
