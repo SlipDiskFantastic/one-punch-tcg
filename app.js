@@ -405,10 +405,12 @@ function renderCard(idx){
     el.addEventListener("click",()=>{if(idx<pack.length-1)renderCard(idx+1);else showSummary();},{once:true});
   } else{
     hint.textContent="TAP CARD TO REVEAL";
+    let flipped=false, canAdvance=false;
     el.addEventListener("click",()=>{
-      if(el.classList.contains("face-down")){
+      if(!flipped){
+        flipped=true;
         playCardFlip();
-        el.classList.remove("face-down");revealedSet.add(idx);hint.textContent="TAP AGAIN TO CONTINUE";
+        el.classList.remove("face-down");revealedSet.add(idx);hint.textContent="";
         spawnCardFlair(el, card);
         if(rc.flash){
           if(navigator.vibrate)navigator.vibrate(20);
@@ -419,7 +421,9 @@ function renderCard(idx){
           else if(card.rarity==="ssr") playSound("pull_ssr");
           else if(card.rarity==="serious-rare"||card.rarity==="rare") playSound("pull_rare");
         }
-      } else {
+        // Allow advance only after flip animation completes (0.58s)
+        setTimeout(()=>{ canAdvance=true; hint.textContent="TAP TO CONTINUE"; }, 620);
+      } else if(canAdvance){
         if(idx<pack.length-1) renderCard(idx+1); else showSummary();
       }
     });
