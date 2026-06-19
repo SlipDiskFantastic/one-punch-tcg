@@ -82,13 +82,13 @@ body{
 .gold-badge{position:absolute;top:14px;right:16px;z-index:10;display:flex;align-items:center;gap:5px;background:rgba(8,10,16,0.7);border:1px solid rgba(239,159,39,0.35);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;letter-spacing:0.06em;color:#ef9f27;backdrop-filter:blur(4px);}
 
 /* ── PACK SCREEN ── */
-.pack-title{text-align:center;margin-bottom:24px;}
+.pack-title{text-align:center;margin-bottom:16px;}
 .pack-title .t1{font-family:'Cinzel Decorative',serif;font-size:10px;letter-spacing:0.22em;color:#ef9f2755;display:block;margin-bottom:6px;}
 .pack-title .t2{font-size:28px;font-weight:700;letter-spacing:0.06em;color:#ef9f27;display:block;line-height:1;}
 .pack-title .t3{font-size:13px;letter-spacing:0.14em;color:rgba(255,255,255,0.38);display:block;margin-top:5px;}
 .pack-counter-label{font-size:9px;letter-spacing:0.1em;color:rgba(239,159,39,0.5);display:block;margin-top:8px;}
 
-.pack-container{position:relative;width:210px;height:300px;margin-bottom:24px;cursor:ns-resize;touch-action:none;}
+.pack-container{position:relative;width:268px;height:382px;margin-bottom:16px;cursor:ns-resize;touch-action:none;}
 .pack-container.dragging{cursor:ns-resize;}
 .pack-body{position:absolute;bottom:0;left:0;right:0;background:#0c0e1c;border:2px solid #ef9f27;border-radius:0 0 14px 14px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .pack-body.has-img{background:none;border-color:#ef9f27;}
@@ -112,6 +112,14 @@ body{
 .pack-info-row{font-size:9px;letter-spacing:0.09em;color:rgba(255,255,255,0.18);text-align:center;}
 .pack-top.slide-open{animation:slideOff 0.42s cubic-bezier(0.3,0,0.5,1) forwards;}
 @keyframes slideOff{0%{transform:translateY(var(--slide-from,-90px));opacity:1;}100%{transform:translateY(-340px);opacity:0;}}
+#openResult{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;border-radius:14px;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:20;background:rgba(8,10,16,0.55);backdrop-filter:blur(2px);}
+#openResult.show{opacity:1;}
+.or-icon{font-size:48px;line-height:1;filter:drop-shadow(0 0 12px var(--or-color));}
+.or-label{font-family:'Cinzel',serif;font-size:15px;font-weight:700;letter-spacing:0.14em;color:var(--or-color);text-shadow:0 0 20px var(--or-color);}
+.or-desc{font-size:9px;letter-spacing:0.1em;color:rgba(255,255,255,0.45);text-align:center;padding:0 24px;}
+.or-bar{width:60px;height:2px;border-radius:1px;background:var(--or-color);opacity:0.5;margin:4px 0;}
+@keyframes openResultPop{0%{transform:scale(0.85);opacity:0;}60%{transform:scale(1.04);}100%{transform:scale(1);opacity:1;}}
+#openResult.show{animation:openResultPop 0.28s cubic-bezier(0.34,1.1,0.64,1) forwards;}
 
 /* ── REVEAL SCREEN ── */
 #revealScreen{padding:0;justify-content:flex-start;}
@@ -368,6 +376,12 @@ body{
         <div class="pack-name-big">ONE PUNCH TCG</div>
         <div class="pack-sub-big">MONSTER ASSOCIATION ARC</div>
       </div>
+    </div>
+    <div id="openResult">
+      <div class="or-icon" id="orIcon"></div>
+      <div class="or-bar"></div>
+      <div class="or-label" id="orLabel"></div>
+      <div class="or-desc" id="orDesc"></div>
     </div>
   </div>
   <div class="pull-instruction" id="pullInstruction">SLIDE UP TO OPEN</div>

@@ -238,7 +238,7 @@ function pullPack(){
 
 /* ── SLIDE MECHANIC ── */
 let dragStartY=0,dragCurrentY=0,isDragging=false,packOpened=false,currentRip=null;
-const DRAG_THRESHOLD=75,TOP_HEIGHT=72,BODY_HEIGHT=228;
+const DRAG_THRESHOLD=90,TOP_HEIGHT=92,BODY_HEIGHT=290;
 
 const packContainer=document.getElementById("packContainer");
 const packTop=document.getElementById("packTop");
@@ -297,12 +297,19 @@ function finishOpen(){
   packTop.classList.add("slide-open");
   // Body reveal flash
   packBody.style.transition="box-shadow 0.35s ease";
-  packBody.style.boxShadow="0 0 48px rgba(239,159,39,0.6), inset 0 0 24px rgba(239,159,39,0.15)";
-  setTimeout(()=>{packBody.style.boxShadow="";packBody.style.transition="";},500);
+  packBody.style.boxShadow=`0 0 56px ${currentRip.color}99, inset 0 0 28px ${currentRip.color}22`;
+  setTimeout(()=>{packBody.style.boxShadow="";packBody.style.transition="";},600);
+  // Open result overlay
+  const or=document.getElementById("openResult");
+  document.getElementById("orIcon").textContent=currentRip.icon;
+  document.getElementById("orLabel").textContent=currentRip.label;
+  document.getElementById("orDesc").textContent=currentRip.desc;
+  or.style.setProperty("--or-color", currentRip.color);
+  or.classList.add("show");
   if(currentRip.confetti)spawnConfetti();else spawnParticles(currentRip.color,14);
   if(currentRip.id==="catastrophic") playSound("rip_catastrophic");
   else if(currentRip.id==="perfect") playSound("rip_perfect");
-  setTimeout(()=>startReveal(),480);
+  setTimeout(()=>startReveal(),700);
 }
 packContainer.addEventListener("touchstart",onDragStart,{passive:true});
 packContainer.addEventListener("touchmove",onDragMove,{passive:false});
@@ -619,6 +626,7 @@ function resetPackScreen(){
   packTop.style.transform="translateY(0)";
   packTop.style.opacity="1";
   packBody.style.boxShadow="none";
+  document.getElementById("openResult").classList.remove("show");
   pullInstruction.textContent="SLIDE UP TO OPEN";
   setTimeout(()=>{packTop.style.transition="";},50);
   const lbl=document.getElementById("packCounterLabel");
