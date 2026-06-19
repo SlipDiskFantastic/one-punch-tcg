@@ -1,0 +1,5 @@
+art/
+generate_art.py
+__pycache__/
+*.pyc
+.env
